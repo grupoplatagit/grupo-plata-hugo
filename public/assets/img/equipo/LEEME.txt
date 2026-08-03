@@ -1,0 +1,16 @@
+📁 CARPETA DE FOTOS DEL EQUIPO
+================================
+
+Colocá las fotos con exactamente estos nombres:
+
+  juan-pablo.jpg    → Foto de Juan Pablo (Fundador & CEO)
+  oswaldo.jpg       → Foto de Oswaldo Rafael (Co-Fundador & CRO)
+
+Formato recomendado:
+  - JPG o PNG
+  - Tamaño mínimo: 400x400 px
+  - Relación de aspecto: cuadrada (1:1) para mejor resultado
+  - Peso máximo recomendado: 500 KB
+
+Una vez que subas las fotos, ya están configuradas en el sitio
+y van a reemplazar automáticamente las iniciales (JP / OR).

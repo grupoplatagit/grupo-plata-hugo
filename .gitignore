@@ -1,0 +1,8 @@
+database/jpmarket.sqlite
+app/local.php
+database/dolar_cache.json
+logs/*
+!logs/.gitkeep
+*.log
+.DS_Store
+Thumbs.db

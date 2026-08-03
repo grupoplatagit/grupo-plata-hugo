@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php -v)",
+      "Bash(echo \"EXIT:$?\")",
+      "WebFetch(domain:ar.linkedin.com)",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\Users\\\\Juanc\\\\Desktop\\\\TRABAJOS\\\\JP MARKET  PRO\\\\public\\\\assets\\\\img\\\\equipo\")",
+      "PowerShell(Get-NetTCPConnection -LocalPort 8082 -State Listen -ErrorAction SilentlyContinue)",
+      "PowerShell(New-Item -ItemType Directory -Force \"c:\\\\Users\\\\Juanc\\\\Desktop\\\\TRABAJOS\\\\JP MARKET  PRO\\\\database\")",
+      "Bash(C:/xampp/php/php.exe -r ' *)"
+    ]
+  }
+}

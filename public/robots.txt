@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /app/
+Disallow: /database/
+Disallow: /logs/
+Disallow: /views/
+
+Sitemap: https://jpmarketpro.com/sitemap.xml

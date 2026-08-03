@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/xampp/php/**)",
+      "PowerShell(& \"C:\\\\xampp\\\\php\\\\php.exe\" -v)",
+      "PowerShell(Start-Process \"C:\\\\xampp\\\\php\\\\php.exe\" -ArgumentList \"-S\", \"localhost:8082\", \"dev-router.php\" -WorkingDirectory \"c:\\\\Users\\\\Juanc\\\\Desktop\\\\TRABAJOS\\\\JP MARKET  PRO\" -PassThru)",
+      "PowerShell(netstat -ano)",
+      "PowerShell(gh --version)",
+      "PowerShell(gh auth status)",
+      "PowerShell(New-Item -ItemType File -Path \"c:\\\\Users\\\\Juanc\\\\Desktop\\\\TRABAJOS\\\\JP MARKET  PRO\\\\logs\\\\.gitkeep\" -Force)",
+      "Read(//c/Users/Juanc/Desktop/TRABAJOS/jp market pro modelo/admin/pages/**)",
+      "Bash(php -S localhost:8082 -t public)",
+      "PowerShell(ngrok --version)",
+      "PowerShell(ngrok http 8082)",
+      "PowerShell(Get-Command php -ErrorAction SilentlyContinue)",
+      "PowerShell(choco install php -y)",
+      "PowerShell(Invoke-RestMethod http://localhost:4040/api/tunnels 2>$null)",
+      "PowerShell(Invoke-WebRequest https://tan-spider-523924.hostingersite.com/ -UseBasicParsing)",
+      "Bash(git restore *)",
+      "Bash(git checkout *)",
+      "Bash(git push *)",
+      "Bash(git remote *)",
+      "Bash(git pull *)",
+      "Bash(git ls-remote *)",
+      "Bash(rm -rf .git)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\Juanc\\Desktop\\TRABAJOS\\JP MARKET  PRO\\favicon_io",
+      "c:\\Users\\Juanc\\Desktop\\TRABAJOS"
+    ]
+  }
+}
