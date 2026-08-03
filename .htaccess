@@ -33,6 +33,10 @@ ErrorDocument 404 /public/404.php
     RewriteRule ^views/   - [F,L]
     RewriteRule ^logs/    - [F,L]
 
+    # ✅ Allow webhook to pass through without rewriting
+    RewriteRule ^webhook/?$ public/webhook/index.php [L]
+    RewriteRule ^wh\.php$ public/wh.php [L]
+
     # Clean URLs for public pages
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
