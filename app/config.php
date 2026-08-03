@@ -12,8 +12,8 @@ if (php_sapi_name() === 'cli-server') {
     unset($_dbHome, $_dbDir);
 }
 
-define('SITE_NAME', 'JP MARKET');
-define('SITE_SLOGAN', 'Empower your mind');
+define('SITE_NAME', 'GRUPO PLATA');
+define('SITE_SLOGAN', 'Activos y Pasivos');
 // Auto-detecta la URL según el entorno
 if (php_sapi_name() === 'cli-server') {
     define('BASE_URL', 'http://localhost:8082');
