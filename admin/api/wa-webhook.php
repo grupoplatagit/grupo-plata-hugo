@@ -22,17 +22,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $token     = $_GET['hub_verify_token'] ?? $_GET['hub.verify_token'] ?? '';
     $challenge = $_GET['hub_challenge']    ?? $_GET['hub.challenge']    ?? '';
 
+    // If no token configured yet, accept any token and save it
     $myToken = getSetting($db, 'wa_webhook_token');
+    if (!$myToken && $token) {
+        setSetting($db, 'wa_webhook_token', $token);
+        $myToken = $token;
+    }
 
-    if ($mode === 'subscribe' && $token === $myToken) {
+    if ($mode === 'subscribe' && (!$myToken || $token === $myToken)) {
         http_response_code(200);
         echo $challenge;
+        logWebhook("VERIFY SUCCESS — mode=$mode");
     } else {
         http_response_code(403);
-        logWebhook("VERIFY FAILED — token mismatch");
+        logWebhook("VERIFY FAILED — token mismatch (got: $token, expected: $myToken)");
         echo 'Forbidden';
     }
     exit;
+}
+
+function setSetting(PDO $db, string $key, string $value): void {
+    $db->prepare("INSERT INTO settings (key,value) VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value")
+       ->execute([$key, $value]);
 }
 
 // ── Incoming messages (POST) ──────────────────────────────────────────────────
