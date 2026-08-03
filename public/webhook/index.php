@@ -1,18 +1,20 @@
 <?php
-require_once __DIR__ . '/../../app/config.php';
-require_once __DIR__ . '/../../app/db.php';
+// Ultra simple webhook - no dependencies
 
-$db = getDB();
-$dir = __DIR__ . '/../../logs';
-if (!is_dir($dir)) mkdir($dir, 0755, true);
+// Log to file
+$log_file = __DIR__ . '/../../logs/webhook.log';
+@mkdir(dirname($log_file), 0755, true);
 
-// GET - Webhook verification (Meta sends this to verify)
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+$method = $_SERVER['REQUEST_METHOD'];
+$time = date('Y-m-d H:i:s');
+
+// GET - Webhook verification
+if ($method === 'GET') {
     $mode = $_GET['hub.mode'] ?? '';
     $token = $_GET['hub.verify_token'] ?? '';
     $challenge = $_GET['hub.challenge'] ?? '';
 
-    file_put_contents($dir . '/webhook.log', date('Y-m-d H:i:s') . " [GET] mode=$mode token=$token\n", FILE_APPEND);
+    file_put_contents($log_file, "$time [GET] mode=$mode token=$token\n", FILE_APPEND);
 
     if ($mode === 'subscribe') {
         http_response_code(200);
@@ -26,25 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 // POST - Incoming messages
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($method === 'POST') {
     $raw = file_get_contents('php://input');
-    $data = json_decode($raw, true);
-
-    file_put_contents($dir . '/webhook.log', date('Y-m-d H:i:s') . " [POST] Received webhook\n", FILE_APPEND);
-
-    if (($data['object'] ?? '') === 'whatsapp_business_account') {
-        foreach ($data['entry'] ?? [] as $entry) {
-            foreach ($entry['changes'] ?? [] as $change) {
-                $value = $change['value'] ?? [];
-
-                foreach ($value['messages'] ?? [] as $msg) {
-                    $from = $msg['from'] ?? '';
-                    $body = $msg['text']['body'] ?? '';
-                    file_put_contents($dir . '/webhook.log', date('Y-m-d H:i:s') . " Message from $from: $body\n", FILE_APPEND);
-                }
-            }
-        }
-    }
+    file_put_contents($log_file, "$time [POST] " . substr($raw, 0, 300) . "\n", FILE_APPEND);
 
     http_response_code(200);
     echo 'OK';
@@ -52,5 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 http_response_code(405);
+echo 'Method not allowed';
 exit;
 ?>
