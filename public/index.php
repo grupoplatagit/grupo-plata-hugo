@@ -13,10 +13,10 @@ $pageTitle = 'Inicio';
         <div class="hbg-orb hbg-orb--3"></div>
     </div>
     <div class="hero-inner">
-        <div class="hero-badge">JP MARKET — Empower your mind</div>
+        <div class="hero-badge"><?= SITE_NAME ?> — <?= SITE_SLOGAN ?></div>
 
-        <h1><span class="jp">JP</span>MARKET</h1>
-        <p class="hero-slogan">Empower your mind</p>
+        <h1><span class="jp">GRUPO</span>PLATA</h1>
+        <p class="hero-slogan"><?= SITE_SLOGAN ?></p>
 
         <p class="hero-desc">
             Conectamos talento, oportunidades y soluciones en una sola plataforma.
@@ -52,7 +52,7 @@ $pageTitle = 'Inicio';
 <!-- ====== CLIENTES ====== -->
 <section class="clients-band">
     <div class="container">
-        <p class="clients-label">Empresas que confían en JP MARKET</p>
+        <p class="clients-label">Empresas que confían en <?= SITE_NAME ?></p>
         <div class="clients-row">
             <div class="client-logo">
                 <span class="client-dot"></span>
@@ -116,8 +116,7 @@ $pageTitle = 'Inicio';
                 <span class="section-tag">Quiénes somos</span>
                 <h2 class="section-title">Más que un mercado,<br>una <span>comunidad</span></h2>
                 <p class="section-lead">
-                    En JP MARKET creemos en el poder de las ideas y el potencial de cada persona.
-                    Trabajamos para conectar talentos, oportunidades y soluciones bajo un mismo techo.
+                    En <?= SITE_NAME ?> creemos en el poder de los activos y pasivos. Trabajamos para conectar información financiera clara y accesible para familias de Santa Fe.
                 </p>
 
                 <div class="about-list">
