@@ -3,11 +3,11 @@
         <div class="footer-grid">
             <div>
                 <a href="<?= BASE_URL ?>" class="brand" style="font-size:1.3rem;display:inline-flex;gap:2px;margin-bottom:14px">
-                    <span class="brand-jp">JP</span><span class="brand-market">MARKET</span>
+                    <span class="brand-jp">GRUPO</span><span class="brand-market">PLATA</span>
                 </a>
                 <p class="footer-desc">
-                    Conectamos talento, oportunidades y soluciones.<br>
-                    <em>Empower your mind.</em>
+                    Activos y Pasivos de Santa Fe.<br>
+                    <em><?= SITE_SLOGAN ?></em>
                 </p>
                 <a href="https://www.instagram.com/jpart.ar" target="_blank" rel="noopener"
                    style="display:inline-flex;align-items:center;gap:8px;margin-top:14px;color:var(--text-muted);font-size:.85rem;text-decoration:none;transition:color .2s"

@@ -8,10 +8,10 @@
     <meta name="google-site-verification" content="PCol5Wu9fdiVBw8Q2GQLghdG38wQyHtKpKmOpgAQXXg">
 
     <!-- SEO primario -->
-    <title>JP MARKET | Agencia de Marketing Digital en Buenos Aires</title>
+    <title><?= SITE_NAME ?> | <?= SITE_SLOGAN ?></title>
     <meta name="description" content="Agencia de marketing digital en La Paternal, Buenos Aires. Especialistas en ROI, gestión de redes sociales, email marketing y campañas digitales. Hacemos crecer tu negocio.">
     <meta name="keywords" content="agencia marketing digital Buenos Aires, marketing digital CABA, gestión redes sociales Argentina, email marketing Argentina, ROI marketing, campañas digitales Buenos Aires, agencia marketing La Paternal, publicidad digital Argentina">
-    <meta name="author" content="JP MARKET">
+    <meta name="author" content="GRUPO PLATA">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://jpmarketpro.com/">
 
@@ -24,17 +24,17 @@
     <!-- Open Graph (WhatsApp, Facebook, LinkedIn) -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://jpmarketpro.com/">
-    <meta property="og:title" content="JP MARKET | Agencia de Marketing Digital en Buenos Aires">
+    <meta property="og:title" content="GRUPO PLATA | Agencia de Marketing Digital en Buenos Aires">
     <meta property="og:description" content="Hacemos crecer tu negocio con marketing digital de resultados. ROI, redes sociales, email marketing y campañas. La Paternal, CABA.">
     <meta property="og:image" content="https://jpmarketpro.com/public/assets/img/android-chrome-512x512.png">
     <meta property="og:image:width" content="512">
     <meta property="og:image:height" content="512">
     <meta property="og:locale" content="es_AR">
-    <meta property="og:site_name" content="JP MARKET">
+    <meta property="og:site_name" content="GRUPO PLATA">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="JP MARKET | Agencia de Marketing Digital en Buenos Aires">
+    <meta name="twitter:title" content="GRUPO PLATA | Agencia de Marketing Digital en Buenos Aires">
     <meta name="twitter:description" content="Hacemos crecer tu negocio con marketing digital de resultados. ROI, redes sociales, email marketing. La Paternal, CABA.">
     <meta name="twitter:image" content="https://jpmarketpro.com/public/assets/img/android-chrome-512x512.png">
 
@@ -43,7 +43,7 @@
     {
         "@context": "https://schema.org",
         "@type": "MarketingAgency",
-        "name": "JP MARKET",
+        "name": "GRUPO PLATA",
         "alternateName": "JP Market Pro",
         "url": "https://jpmarketpro.com",
         "logo": "https://jpmarketpro.com/public/assets/img/logo.png",
@@ -102,14 +102,14 @@
     {
         "@context": "https://schema.org",
         "@type": "ItemList",
-        "name": "Servicios de JP MARKET",
+        "name": "Servicios de GRUPO PLATA",
         "itemListElement": [
-            {"@type":"ListItem","position":1,"item":{"@type":"Service","name":"Performance Marketing","description":"Campañas orientadas a resultados: leads, ventas y escalabilidad medible desde el primer mes.","provider":{"@type":"Organization","name":"JP MARKET"}}},
-            {"@type":"ListItem","position":2,"item":{"@type":"Service","name":"CRM y Automatización","description":"Automatizamos seguimiento, ventas y fidelización para aumentar conversión sin esfuerzo extra.","provider":{"@type":"Organization","name":"JP MARKET"}}},
-            {"@type":"ListItem","position":3,"item":{"@type":"Service","name":"Paid Ads","description":"Meta Ads, Google Ads y estrategias de adquisición optimizadas por ROI.","provider":{"@type":"Organization","name":"JP MARKET"}}},
-            {"@type":"ListItem","position":4,"item":{"@type":"Service","name":"Desarrollo Web","description":"Sitios modernos y rápidos con panel de administración propio.","provider":{"@type":"Organization","name":"JP MARKET"}}},
-            {"@type":"ListItem","position":5,"item":{"@type":"Service","name":"Growth Strategy","description":"Estrategias de crecimiento basadas en datos reales y escalabilidad con dirección.","provider":{"@type":"Organization","name":"JP MARKET"}}},
-            {"@type":"ListItem","position":6,"item":{"@type":"Service","name":"Analytics y Optimización","description":"Análisis de comportamiento para mejorar el embudo y bajar el costo por conversión.","provider":{"@type":"Organization","name":"JP MARKET"}}}
+            {"@type":"ListItem","position":1,"item":{"@type":"Service","name":"Performance Marketing","description":"Campañas orientadas a resultados: leads, ventas y escalabilidad medible desde el primer mes.","provider":{"@type":"Organization","name":"GRUPO PLATA"}}},
+            {"@type":"ListItem","position":2,"item":{"@type":"Service","name":"CRM y Automatización","description":"Automatizamos seguimiento, ventas y fidelización para aumentar conversión sin esfuerzo extra.","provider":{"@type":"Organization","name":"GRUPO PLATA"}}},
+            {"@type":"ListItem","position":3,"item":{"@type":"Service","name":"Paid Ads","description":"Meta Ads, Google Ads y estrategias de adquisición optimizadas por ROI.","provider":{"@type":"Organization","name":"GRUPO PLATA"}}},
+            {"@type":"ListItem","position":4,"item":{"@type":"Service","name":"Desarrollo Web","description":"Sitios modernos y rápidos con panel de administración propio.","provider":{"@type":"Organization","name":"GRUPO PLATA"}}},
+            {"@type":"ListItem","position":5,"item":{"@type":"Service","name":"Growth Strategy","description":"Estrategias de crecimiento basadas en datos reales y escalabilidad con dirección.","provider":{"@type":"Organization","name":"GRUPO PLATA"}}},
+            {"@type":"ListItem","position":6,"item":{"@type":"Service","name":"Analytics y Optimización","description":"Análisis de comportamiento para mejorar el embudo y bajar el costo por conversión.","provider":{"@type":"Organization","name":"GRUPO PLATA"}}}
         ]
     }
     </script>
@@ -124,7 +124,7 @@
     <nav class="navbar">
         <div class="container">
             <a href="#inicio" class="brand" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
-                <img src="<?= BASE_URL ?>/public/assets/img/logo.png" alt="JP MARKET" class="brand-logo">
+                <img src="<?= BASE_URL ?>/public/assets/img/logo.png" alt="GRUPO PLATA" class="brand-logo">
             </a>
             <ul class="nav-links" id="navLinks">
                 <li><a href="#inicio">Inicio</a></li>
