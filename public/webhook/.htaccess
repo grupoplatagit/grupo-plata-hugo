@@ -1,0 +1,19 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /webhook/
+
+    # Allow all requests
+    RewriteRule ^(.*)$ index.php [L]
+</IfModule>
+
+# Allow all methods
+<Limit GET POST PUT DELETE OPTIONS>
+    Allow from all
+</Limit>
+
+# Disable any restrictions
+Order allow,deny
+Allow from all
+
+# Enable index.php
+DirectoryIndex index.php
