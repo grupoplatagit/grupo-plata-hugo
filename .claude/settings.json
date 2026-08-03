@@ -26,7 +26,9 @@
       "Bash(git init *)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git branch *)"
+      "Bash(git branch *)",
+      "PowerShell(Invoke-WebRequest https://api.github.com/repos/grupoplatagit/grupo-plata-hugo/commits -UseBasicParsing | ConvertFrom-Json | Select-Object -First 5 @{Name='Commit'; Expression={$_.commit.message}}, @{Name='Author'; Expression={$_.commit.author.name}}  | Format-Table)",
+      "Bash(git ls-tree *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Juanc\\Desktop\\TRABAJOS\\JP MARKET  PRO\\favicon_io",
