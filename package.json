@@ -1,0 +1,19 @@
+{
+  "name": "grupo-plata-webhook",
+  "version": "1.0.0",
+  "description": "WhatsApp Webhook Server for Grupo Plata",
+  "main": "webhook-server.js",
+  "scripts": {
+    "start": "node webhook-server.js",
+    "dev": "node webhook-server.js"
+  },
+  "keywords": ["whatsapp", "webhook"],
+  "author": "Grupo Plata",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
