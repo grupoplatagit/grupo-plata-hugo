@@ -18,7 +18,9 @@ define('SITE_SLOGAN', 'Empower your mind');
 if (php_sapi_name() === 'cli-server') {
     define('BASE_URL', 'http://localhost:8082');
 } else {
-    define('BASE_URL', 'https://jpmarketpro.com');
+    $scheme = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http';
+    $host   = $_SERVER['HTTP_HOST'] ?? 'jpmarketpro.com';
+    define('BASE_URL', $scheme . '://' . $host);
 }
 define('ADMIN_URL', BASE_URL . '/admin');
 
