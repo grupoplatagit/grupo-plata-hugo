@@ -1,4 +1,5 @@
 const express = require('express');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -57,8 +58,21 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// ✅ Proxy para PHP (todo lo demás va al sitio PHP)
+// Redirige todas las otras peticiones al servidor PHP en Hostinger
+app.use('/', createProxyMiddleware({
+    target: 'https://tan-spider-523924.hostingersite.com',
+    changeOrigin: true,
+    pathRewrite: { '^/': '/' },
+    onError: (err, req, res) => {
+        console.error('Proxy error:', err);
+        res.status(503).send('Service Unavailable');
+    }
+}));
+
 app.listen(PORT, () => {
     console.log(`🚀 Webhook server running on port ${PORT}`);
     console.log(`📍 Webhook URL: http://localhost:${PORT}/webhook`);
     console.log(`🔐 Webhook Token: ${process.env.WEBHOOK_TOKEN || 'grupo_plata_verify_2024'}`);
+    console.log(`🌐 Proxy enabled for PHP app`);
 });
