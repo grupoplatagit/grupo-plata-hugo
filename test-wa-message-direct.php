@@ -27,14 +27,14 @@ echo "✅ Tabla wa_messages verificada\n\n";
 try {
     $stmt = $db->prepare("
         INSERT INTO wa_messages
-        (from_phone, body, msg_id, direction, leido, created_at)
-        VALUES (?, ?, ?, ?, ?, datetime('now', 'localtime'))
+        (from_phone, body, wa_msg_id, direction, leido, created_at, wa_status)
+        VALUES (?, ?, ?, ?, ?, datetime('now', 'localtime'), 'received')
     ");
 
     $stmt->execute([
         '+5491234567890',
         '¡Hola! Este es un mensaje de prueba desde Grupo Plata 🎉',
-        'msg_test_' . time(),
+        'wamid_test_' . time(),
         'in',
         0
     ]);
