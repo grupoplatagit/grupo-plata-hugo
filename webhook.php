@@ -11,16 +11,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $token = $_GET['hub.verify_token'] ?? '';
     $challenge = $_GET['hub.challenge'] ?? '';
 
-    file_put_contents($dir . '/webhook.log', date('Y-m-d H:i:s') . " GET verification: mode=$mode, token=$token\n", FILE_APPEND);
+    file_put_contents($dir . '/webhook.log', date('Y-m-d H:i:s') . " GET: mode=$mode, token=$token, challenge=$challenge\n", FILE_APPEND);
 
-    // Accept any token - Meta just needs a 200 response with the challenge
-    if ($mode === 'subscribe') {
+    // Respond to Meta's verification
+    if ($mode === 'subscribe' && $challenge) {
         http_response_code(200);
         echo $challenge;
         exit;
     }
 
-    http_response_code(403);
+    // Test response
+    http_response_code(200);
+    echo '1234';
     exit;
 }
 
