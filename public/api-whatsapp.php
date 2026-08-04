@@ -135,10 +135,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             VALUES (?, ?, 'in', ?, ?, ?, ?, ?, ?, 0, 'received', datetime('now', 'localtime'))
                         ")->execute([$from, $wa_msg_id, $msg_type, $body, $media_id, $mime_type, $file_name, $caption]);
 
-                        @file_put_contents($log_dir . '/whatsapp-webhook.log',
-                            date('Y-m-d H:i:s') . " MSG IN [$msg_type]: $from - $body (wamid: $wa_msg_id)\n",
-                            FILE_APPEND
-                        );
+                        $log_msg = date('Y-m-d H:i:s') . " MSG IN [$msg_type]: $from - $body (wamid: $wa_msg_id)";
+                        if ($media_id) {
+                            $log_msg .= " | media_id: " . substr($media_id, 0, 30);
+                        } else if ($msg_type !== 'text') {
+                            $log_msg .= " | ⚠️ media_id VACÍO";
+                        }
+                        @file_put_contents($log_dir . '/whatsapp-webhook.log', $log_msg . "\n", FILE_APPEND);
                     } catch (Exception $e) {
                         @file_put_contents($log_dir . '/whatsapp-webhook.log',
                             date('Y-m-d H:i:s') . " Error inserting message: " . $e->getMessage() . "\n",
