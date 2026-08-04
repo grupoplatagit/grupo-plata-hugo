@@ -64,6 +64,12 @@ app.use('/', createProxyMiddleware({
     target: 'https://tan-spider-523924.hostingersite.com',
     changeOrigin: true,
     pathRewrite: { '^/': '/' },
+    onProxyReq: (proxyReq, req, res) => {
+        // Mantén el host original para que PHP detecte grupoplatasf.com
+        proxyReq.setHeader('Host', req.get('host'));
+        proxyReq.setHeader('X-Forwarded-Host', req.get('host'));
+        proxyReq.setHeader('X-Forwarded-Proto', 'https');
+    },
     onError: (err, req, res) => {
         console.error('Proxy error:', err);
         res.status(503).send('Service Unavailable');
