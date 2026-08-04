@@ -10,6 +10,9 @@ if (isLoggedIn()) {
 
 $error   = '';
 $success = '';
+$db = getDB();
+$admins = $db->query("SELECT id, nombre, email FROM admins WHERE activo = 1 ORDER BY nombre")->fetchAll(\PDO::FETCH_ASSOC);
+$selectedEmail = $_POST['email'] ?? $_GET['user'] ?? '';
 
 // ── Olvidé mi contraseña ──────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['forgot'])) {
@@ -99,12 +102,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['forgot'])) {
             border-radius: 9px; padding: 13px; font-weight: 700; font-size: .95rem;
             font-family: inherit; cursor: pointer; transition: all .2s; margin-top: 8px; }
         .btn:hover { background: #22d3ee; box-shadow: 0 0 24px rgba(6,182,212,0.3); }
+        .users-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 28px; }
+        .user-card { background: var(--bg); border: 2px solid var(--border); border-radius: 12px; padding: 16px;
+            cursor: pointer; text-align: center; transition: all .2s; }
+        .user-card:hover { border-color: var(--accent); box-shadow: 0 0 16px rgba(6,182,212,0.1); }
+        .user-card.selected { border-color: var(--accent); background: rgba(6,182,212,0.1); box-shadow: 0 0 16px rgba(6,182,212,0.15); }
+        .user-avatar { width: 50px; height: 50px; margin: 0 auto 8px;
+            background: linear-gradient(135deg, var(--accent), #0891b2); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.4rem; }
+        .user-name { font-weight: 600; font-size: .9rem; margin-bottom: 3px; }
+        .user-email { font-size: .75rem; color: var(--muted); }
+        .hidden-input { display: none; }
         .alert { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25);
             color: var(--danger); padding: 11px 16px; border-radius: 9px;
             font-size: .875rem; margin-bottom: 20px; }
         .back-link { display: block; text-align: center; margin-top: 20px;
             font-size: .8rem; color: var(--muted); text-decoration: none; transition: color .2s; }
         .back-link:hover { color: var(--text); }
+        @media (max-width: 480px) { .users-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -114,20 +129,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['forgot'])) {
         </div>
         <div class="login-card">
             <div class="login-title">Bienvenido de vuelta</div>
-            <p class="subtitle">Panel de administración · JP MARKET</p>
+            <p class="subtitle">Panel de administración · GRUPO PLATA</p>
             <?php if ($error): ?>
                 <div class="alert"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
             <?php if ($success): ?>
                 <div class="alert" style="background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.25);color:#4ade80"><?= htmlspecialchars($success) ?></div>
             <?php endif; ?>
+
+            <div class="users-grid">
+                <?php foreach ($admins as $admin): ?>
+                    <div class="user-card" onclick="selectUser('<?= htmlspecialchars($admin['email']) ?>', this)">
+                        <div class="user-avatar"><?= htmlspecialchars(substr($admin['nombre'], 0, 1)) ?></div>
+                        <div class="user-name"><?= htmlspecialchars($admin['nombre']) ?></div>
+                        <div class="user-email"><?= htmlspecialchars($admin['email']) ?></div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
             <form method="POST" action="">
                 <input type="hidden" name="csrf_token" value="<?= csrfToken() ?>">
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required
-                        value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
-                        placeholder="admin@jpmarket.com">
+                        value="<?= htmlspecialchars($selectedEmail) ?>"
+                        placeholder="Seleccioná un usuario o ingresá un email">
                 </div>
                 <div class="form-group">
                     <label for="password">Contraseña</label>
@@ -136,6 +162,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['forgot'])) {
                 <button type="submit" class="btn">Ingresar al panel &#8594;</button>
             </form>
         </div>
+
+        <script>
+            function selectUser(email, element) {
+                document.getElementById('email').value = email;
+                document.querySelectorAll('.user-card').forEach(el => el.classList.remove('selected'));
+                element.classList.add('selected');
+                document.getElementById('password').focus();
+            }
+
+            // Marcar el usuario seleccionado al cargar si hay uno
+            if (document.getElementById('email').value) {
+                document.querySelectorAll('.user-card').forEach(card => {
+                    if (card.querySelector('.user-email').textContent.trim() === document.getElementById('email').value) {
+                        card.classList.add('selected');
+                    }
+                });
+            }
+        </script>
         <form method="POST" action="" style="text-align:center;margin-top:12px">
             <input type="hidden" name="csrf_token" value="<?= csrfToken() ?>">
             <button type="submit" name="forgot" value="1" style="background:none;border:none;color:var(--muted);font-size:.8rem;cursor:pointer;font-family:inherit;transition:color .2s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
