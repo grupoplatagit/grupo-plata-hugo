@@ -104,23 +104,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['forgot'])) {
             border-radius: 9px; padding: 13px; font-weight: 700; font-size: .95rem;
             font-family: inherit; cursor: pointer; transition: all .2s; margin-top: 8px; }
         .btn:hover { background: #22d3ee; box-shadow: 0 0 24px rgba(6,182,212,0.3); }
-        .users-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 28px; }
-        .user-card { background: var(--bg); border: 2px solid var(--border); border-radius: 12px; padding: 16px;
-            cursor: pointer; text-align: center; transition: all .2s; }
-        .user-card:hover { border-color: var(--accent); box-shadow: 0 0 16px rgba(6,182,212,0.1); }
-        .user-card.selected { border-color: var(--accent); background: rgba(6,182,212,0.1); box-shadow: 0 0 16px rgba(6,182,212,0.15); }
-        .user-avatar { width: 50px; height: 50px; margin: 0 auto 8px;
+        .users-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px; justify-items: center; }
+        .user-card { background: rgba(22, 22, 22, 0.5); border: 2px solid var(--border); border-radius: 24px; padding: 24px 20px;
+            cursor: pointer; text-align: center; transition: all .3s; width: 100%; max-width: 160px; }
+        .user-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 8px 32px rgba(6,182,212,0.2); }
+        .user-card.selected { border-color: var(--accent); background: rgba(6,182,212,0.15); box-shadow: 0 0 24px rgba(6,182,212,0.25); }
+        .user-avatar { width: 90px; height: 90px; margin: 0 auto 14px;
             background: linear-gradient(135deg, var(--accent), #0891b2); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.4rem; }
-        .user-name { font-weight: 600; font-size: .9rem; margin-bottom: 3px; }
-        .user-email { font-size: .75rem; color: var(--muted); }
-        .hidden-input { display: none; }
+            display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 2.2rem;
+            border: 3px solid var(--border); object-fit: cover; overflow: hidden; }
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user-name { font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
+        .user-role { font-size: .75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .user-email { font-size: .7rem; color: var(--muted); margin-top: 4px; opacity: 0; }
         .alert { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25);
             color: var(--danger); padding: 11px 16px; border-radius: 9px;
             font-size: .875rem; margin-bottom: 20px; }
         .back-link { display: block; text-align: center; margin-top: 20px;
             font-size: .8rem; color: var(--muted); text-decoration: none; transition: color .2s; }
         .back-link:hover { color: var(--text); }
+        @media (max-width: 900px) { .users-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 480px) { .users-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -144,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['forgot'])) {
                     <div class="user-card" onclick="selectUser('<?= htmlspecialchars($admin['email']) ?>', this)">
                         <div class="user-avatar"><?= htmlspecialchars(substr($admin['nombre'], 0, 1)) ?></div>
                         <div class="user-name"><?= htmlspecialchars($admin['nombre']) ?></div>
-                        <div class="user-email"><?= htmlspecialchars($admin['email']) ?></div>
+                        <div class="user-role">Admin</div>
                     </div>
                 <?php endforeach; ?>
             </div>
