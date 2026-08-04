@@ -19,8 +19,8 @@ $pageTitle = 'Inicio';
         <p class="hero-slogan"><?= SITE_SLOGAN ?></p>
 
         <p class="hero-desc">
-            Conectamos talento, oportunidades y soluciones en una sola plataforma.
-            Tu crecimiento empieza acá.
+            Créditos seguros y accesibles para activos, pasivos, provinciales y jubilados de Santa Fe.
+            Financiamiento pensado para vos.
         </p>
 
         <div class="hero-actions">
@@ -114,31 +114,31 @@ $pageTitle = 'Inicio';
         <div class="about-grid">
             <div>
                 <span class="section-tag">Quiénes somos</span>
-                <h2 class="section-title">Más que un mercado,<br>una <span>comunidad</span></h2>
+                <h2 class="section-title">Créditos pensados<br>para <span>vos</span></h2>
                 <p class="section-lead">
                     En <?= SITE_NAME ?> creemos en el poder de los activos y pasivos. Trabajamos para conectar información financiera clara y accesible para familias de Santa Fe.
                 </p>
 
                 <div class="about-list">
                     <div class="about-item">
-                        <div class="about-icon">&#9881;</div>
+                        <div class="about-icon">💳</div>
                         <div>
-                            <h4>Innovación constante</h4>
-                            <p>Siempre a la vanguardia, adoptando las mejores herramientas para que tus proyectos estén un paso adelante.</p>
+                            <h4>Créditos accesibles</h4>
+                            <p>Tasas justas y flexibles para activos, pasivos, provinciales y jubilados de Santa Fe.</p>
                         </div>
                     </div>
                     <div class="about-item">
-                        <div class="about-icon">&#128101;</div>
+                        <div class="about-icon">⚡</div>
                         <div>
-                            <h4>Equipo comprometido</h4>
-                            <p>Profesionales dedicados a tu éxito en cada etapa, desde la idea inicial hasta los resultados finales.</p>
+                            <h4>Trámite rápido</h4>
+                            <p>Aprobación en 24 horas. Documentación simple. Sin vueltas ni sorpresas.</p>
                         </div>
                     </div>
                     <div class="about-item">
-                        <div class="about-icon">&#128200;</div>
+                        <div class="about-icon">🔒</div>
                         <div>
-                            <h4>Resultados medibles</h4>
-                            <p>Estrategias con impacto real, métricas claras y seguimiento continuo de tu crecimiento.</p>
+                            <h4>100% Seguro</h4>
+                            <p>Tu información está protegida. Transacciones seguras y transparentes.</p>
                         </div>
                     </div>
                 </div>
@@ -281,21 +281,21 @@ $pageTitle = 'Inicio';
         <div class="services-grid">
             <div class="service-card">
                 <div class="service-num">01</div>
-                <div class="service-icon">&#128293;</div>
-                <h3>Performance Marketing</h3>
-                <p>Campañas orientadas a resultados reales: leads, ventas y escalabilidad medible desde el primer mes.</p>
+                <div class="service-icon">💰</div>
+                <h3>Créditos para Activos</h3>
+                <p>Financiamiento flexible para personas en actividad. Tasas competitivas sin requisitos imposibles.</p>
             </div>
             <div class="service-card">
                 <div class="service-num">02</div>
-                <div class="service-icon">&#9889;</div>
-                <h3>CRM & Automatización</h3>
-                <p>Automatizamos seguimiento, ventas y fidelización para ahorrar tiempo y aumentar conversión sin esfuerzo extra.</p>
+                <div class="service-icon">🏛️</div>
+                <h3>Créditos para Pasivos & Jubilados</h3>
+                <p>Créditos pensados especialmente para jubilados y pasivos de la provincia de Santa Fe.</p>
             </div>
             <div class="service-card">
                 <div class="service-num">03</div>
-                <div class="service-icon">&#127919;</div>
-                <h3>Paid Ads</h3>
-                <p>Meta Ads, Google Ads y estrategias de adquisición optimizadas por ROI para que cada peso invertido trabaje.</p>
+                <div class="service-icon">📋</div>
+                <h3>Créditos Provinciales</h3>
+                <p>Programas especiales para empleados públicos y trabajadores provinciales con beneficios exclusivos.</p>
             </div>
             <div class="service-card">
                 <div class="service-num">04</div>
