@@ -76,15 +76,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['forgot'])) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { width: 100%; height: 100%; }
         :root { --bg:#001a3a; --surface:#0d2547; --accent:#00A8E8; --accent-dark:#003D82; --text:#d4d4d4; --muted:#8fa0b8; --border:#1a4a7a; --danger:#ef4444; }
         body {
             font-family: 'Inter', system-ui, sans-serif;
-            background: linear-gradient(135deg, #001a3a 0%, #0a2f5f 50%, #001530 100%);
+            background-color: #0a1f47 !important;
+            background: #0a1f47 linear-gradient(135deg, #001a3a 0%, #0a2f5f 50%, #001530 100%) !important;
             color: var(--text);
-            min-height: 100vh; display: grid; place-items: center;
-            background-image:
-                radial-gradient(ellipse at 50% 0%, rgba(0,168,232,0.05) 0%, transparent 60%),
-                radial-gradient(ellipse at 100% 50%, rgba(0,168,232,0.03) 0%, transparent 50%);
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
             position: relative;
             overflow: hidden;
         }
