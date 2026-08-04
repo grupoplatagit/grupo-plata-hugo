@@ -76,15 +76,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['forgot'])) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root { --bg:#0a2f5f; --surface:#0d3d7a; --accent:#00A8E8; --accent-dark:#003D82; --text:#d4d4d4; --muted:#8fa0b8; --border:#1a5a9a; --danger:#ef4444; }
+        :root { --bg:#001a3a; --surface:#0d2547; --accent:#00A8E8; --accent-dark:#003D82; --text:#d4d4d4; --muted:#8fa0b8; --border:#1a4a7a; --danger:#ef4444; }
         body {
             font-family: 'Inter', system-ui, sans-serif;
-            background: linear-gradient(135deg, #0a2f5f 0%, #1a4a7a 50%, #0a3a6f 100%);
+            background: linear-gradient(135deg, #001a3a 0%, #0a2f5f 50%, #001530 100%);
             color: var(--text);
             min-height: 100vh; display: grid; place-items: center;
             background-image:
-                radial-gradient(ellipse at 50% 0%, rgba(0,168,232,0.08) 0%, transparent 60%),
-                radial-gradient(ellipse at 100% 50%, rgba(0,168,232,0.05) 0%, transparent 50%);
+                radial-gradient(ellipse at 50% 0%, rgba(0,168,232,0.05) 0%, transparent 60%),
+                radial-gradient(ellipse at 100% 50%, rgba(0,168,232,0.03) 0%, transparent 50%);
             position: relative;
             overflow: hidden;
         }
@@ -102,9 +102,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['forgot'])) {
         .login-logo { display: flex; justify-content: center; margin-bottom: 28px; }
         .login-logo img { height: 60px; width: auto; object-fit: contain; }
         .login-card {
-            background: rgba(13, 61, 122, 0.6); border: 1px solid rgba(0, 168, 232, 0.3);
+            background: rgba(10, 37, 71, 0.5); border: 1px solid rgba(0, 168, 232, 0.25);
             border-radius: 18px; padding: 32px 28px;
-            box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 40px rgba(0, 168, 232, 0.1);
+            box-shadow: 0 24px 80px rgba(0,0,0,0.7), 0 0 40px rgba(0, 168, 232, 0.08);
             backdrop-filter: blur(10px);
         }
         .login-title { font-size: 1.3rem; font-weight: 800; text-align: center; margin-bottom: 4px; }
