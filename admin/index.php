@@ -49,8 +49,8 @@ include __DIR__ . '/../views/admin/header.php';
 
 <!-- Stats principales -->
 <div class="stats-row">
-    <div class="stat-card" style="border-color:rgba(6,182,212,0.35)">
-        <div class="val" style="color:#06b6d4"><?= $leadsNuevos ?></div>
+    <div class="stat-card" style="border-color:rgba(0,168,232,0.35)">
+        <div class="val" style="color:#00A8E8"><?= $leadsNuevos ?></div>
         <div class="lbl">Leads sin leer &#128276;</div>
     </div>
     <div class="stat-card">
@@ -108,7 +108,7 @@ include __DIR__ . '/../views/admin/header.php';
                     </div>
                 </div>
                 <div style="text-align:right">
-                    <div style="font-size:1.2rem;font-weight:800;color:<?= $tipo==='blue'?'#f59e0b':($tipo==='bolsa'?'#a78bfa':'#06b6d4') ?>">
+                    <div style="font-size:1.2rem;font-weight:800;color:<?= $tipo==='blue'?'#f59e0b':($tipo==='bolsa'?'#a78bfa':'#00A8E8') ?>">
                         $<?= number_format($d['venta'], 0, ',', '.') ?>
                     </div>
                     <div style="font-size:.72rem;color:var(--muted)">Venta</div>
@@ -220,7 +220,7 @@ include __DIR__ . '/../views/admin/header.php';
                     <td><?= htmlspecialchars($l['nombre']) ?></td>
                     <td><?= htmlspecialchars($l['nicho']) ?></td>
                     <td><?= htmlspecialchars($l['pais']) ?></td>
-                    <td><span style="color:#06b6d4;font-weight:600"><?= htmlspecialchars($l['presupuesto']) ?></span></td>
+                    <td><span style="color:#00A8E8;font-weight:600"><?= htmlspecialchars($l['presupuesto']) ?></span></td>
                     <td><?= formatDate($l['created_at']) ?></td>
                 </tr>
                 <?php endforeach; endif; ?>
