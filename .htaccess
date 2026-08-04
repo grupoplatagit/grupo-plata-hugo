@@ -36,7 +36,11 @@ ErrorDocument 404 /public/404.php
     RewriteRule ^views/   - [F,L]
     RewriteRule ^logs/    - [F,L]
 
-    # ✅ Allow .php files to be accessed directly (webhook)
+    # ✅ Allow webhook.php to be accessed directly
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^public/webhook\.php$ - [L]
+
+    # Allow other .php files to be accessed directly
     RewriteCond %{REQUEST_FILENAME} \.php$ [NC]
     RewriteRule ^ - [L]
 
