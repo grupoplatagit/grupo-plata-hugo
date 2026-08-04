@@ -1,11 +1,7 @@
 <?php
-require_once __DIR__ . '/app/config.php';
-require_once __DIR__ . '/app/db.php';
-require_once __DIR__ . '/app/functions.php';
+// Webhook for WhatsApp Business API
+// No external dependencies needed for verification
 
-$db = getDB();
-
-// Log everything
 $dir = __DIR__ . '/logs';
 if (!is_dir($dir)) mkdir($dir, 0755, true);
 
