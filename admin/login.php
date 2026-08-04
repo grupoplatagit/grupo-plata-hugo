@@ -76,37 +76,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['forgot'])) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root { --bg:#0a0a0a; --surface:#161616; --accent:#00A8E8; --accent-dark:#003D82; --text:#d4d4d4; --muted:#6b6b6b; --border:#2a2a2a; --danger:#ef4444; }
+        :root { --bg:#0a2f5f; --surface:#0d3d7a; --accent:#00A8E8; --accent-dark:#003D82; --text:#d4d4d4; --muted:#8fa0b8; --border:#1a5a9a; --danger:#ef4444; }
         body {
             font-family: 'Inter', system-ui, sans-serif;
-            background: var(--bg); color: var(--text);
+            background: linear-gradient(135deg, #0a2f5f 0%, #1a4a7a 50%, #0a3a6f 100%);
+            color: var(--text);
             min-height: 100vh; display: grid; place-items: center;
-            background-image: radial-gradient(ellipse at 50% 0%, rgba(6,182,212,0.07) 0%, transparent 60%);
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(0,168,232,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 100% 50%, rgba(0,168,232,0.05) 0%, transparent 50%);
+            position: relative;
+            overflow: hidden;
         }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-30px) rotate(15deg); opacity: 0.6; }
+        }
+        .floating-bill { position: absolute; font-size: 3rem; animation: float 6s ease-in-out infinite; }
+        .bill-1 { left: 5%; top: 10%; animation-delay: 0s; }
+        .bill-2 { right: 10%; top: 15%; animation-delay: 1.5s; }
+        .bill-3 { left: 15%; bottom: 20%; animation-delay: 3s; }
+        .bill-4 { right: 15%; bottom: 30%; animation-delay: 4.5s; }
+        .bill-5 { left: 50%; top: 5%; animation-delay: 2s; }
         .login-wrap { width: 100%; max-width: 560px; padding: 20px; }
         .login-logo { display: flex; justify-content: center; margin-bottom: 28px; }
         .login-logo img { height: 60px; width: auto; object-fit: contain; }
         .login-card {
-            background: var(--surface); border: 1px solid var(--border);
+            background: rgba(13, 61, 122, 0.6); border: 1px solid rgba(0, 168, 232, 0.3);
             border-radius: 18px; padding: 32px 28px;
-            box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+            box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 40px rgba(0, 168, 232, 0.1);
+            backdrop-filter: blur(10px);
         }
         .login-title { font-size: 1.3rem; font-weight: 800; text-align: center; margin-bottom: 4px; }
         .subtitle { text-align: center; color: var(--muted); font-size: .85rem; margin-bottom: 32px; }
         .form-group { margin-bottom: 16px; }
         label { display: block; font-size: .75rem; font-weight: 600; color: var(--muted);
             text-transform: uppercase; letter-spacing: 1px; margin-bottom: 7px; }
-        input { width: 100%; background: var(--bg); border: 1px solid var(--border);
+        input { width: 100%; background: rgba(10, 47, 95, 0.5); border: 1px solid rgba(0, 168, 232, 0.3);
             border-radius: 9px; padding: 12px 14px; color: var(--text);
             font-size: .92rem; font-family: inherit; transition: border-color .2s, box-shadow .2s; }
-        input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,168,232,0.1); }
+        input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,168,232,0.2); }
+        input::placeholder { color: rgba(213, 221, 228, 0.5); }
         .btn { width: 100%; background: var(--accent); color: #000; border: none;
             border-radius: 9px; padding: 13px; font-weight: 700; font-size: .95rem;
             font-family: inherit; cursor: pointer; transition: all .2s; margin-top: 8px; }
         .btn:hover { background: var(--accent-dark); box-shadow: 0 0 24px rgba(0,168,232,0.3); }
         .users-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px; justify-items: center; }
-        .user-card { background: rgba(22, 22, 22, 0.5); border: 2px solid var(--border); border-radius: 24px; padding: 24px 20px;
-            cursor: pointer; text-align: center; transition: all .3s; width: 100%; max-width: 160px; }
+        .user-card { background: rgba(10, 47, 95, 0.4); border: 2px solid rgba(0, 168, 232, 0.2); border-radius: 24px; padding: 24px 20px;
+            cursor: pointer; text-align: center; transition: all .3s; width: 100%; max-width: 160px; backdrop-filter: blur(5px); }
         .user-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 8px 32px rgba(0,168,232,0.2); }
         .user-card.selected { border-color: var(--accent); background: rgba(0,168,232,0.15); box-shadow: 0 0 24px rgba(0,168,232,0.25); }
         .user-avatar { width: 90px; height: 90px; margin: 0 auto 14px;
@@ -128,6 +145,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['forgot'])) {
     </style>
 </head>
 <body>
+    <div class="floating-bill bill-1">💵</div>
+    <div class="floating-bill bill-2">💴</div>
+    <div class="floating-bill bill-3">💶</div>
+    <div class="floating-bill bill-4">💷</div>
+    <div class="floating-bill bill-5">💵</div>
+
     <div class="login-wrap">
         <div class="login-logo">
             <img src="<?= BASE_URL ?>/public/assets/img/logo.png" alt="JP MARKET">
