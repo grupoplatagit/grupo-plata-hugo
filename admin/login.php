@@ -76,19 +76,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['forgot'])) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root { --bg:#0a0a0a; --surface:#161616; --accent:#06b6d4; --text:#d4d4d4; --muted:#6b6b6b; --border:#2a2a2a; --danger:#ef4444; }
+        :root { --bg:#0a0a0a; --surface:#161616; --accent:#00A8E8; --accent-dark:#003D82; --text:#d4d4d4; --muted:#6b6b6b; --border:#2a2a2a; --danger:#ef4444; }
         body {
             font-family: 'Inter', system-ui, sans-serif;
             background: var(--bg); color: var(--text);
             min-height: 100vh; display: grid; place-items: center;
             background-image: radial-gradient(ellipse at 50% 0%, rgba(6,182,212,0.07) 0%, transparent 60%);
         }
-        .login-wrap { width: 100%; max-width: 420px; padding: 20px; }
+        .login-wrap { width: 100%; max-width: 560px; padding: 20px; }
         .login-logo { display: flex; justify-content: center; margin-bottom: 28px; }
         .login-logo img { height: 60px; width: auto; object-fit: contain; }
         .login-card {
             background: var(--surface); border: 1px solid var(--border);
-            border-radius: 18px; padding: 40px 36px;
+            border-radius: 18px; padding: 32px 28px;
             box-shadow: 0 24px 80px rgba(0,0,0,0.4);
         }
         .login-title { font-size: 1.3rem; font-weight: 800; text-align: center; margin-bottom: 4px; }
@@ -99,18 +99,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['forgot'])) {
         input { width: 100%; background: var(--bg); border: 1px solid var(--border);
             border-radius: 9px; padding: 12px 14px; color: var(--text);
             font-size: .92rem; font-family: inherit; transition: border-color .2s, box-shadow .2s; }
-        input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(6,182,212,0.1); }
+        input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,168,232,0.1); }
         .btn { width: 100%; background: var(--accent); color: #000; border: none;
             border-radius: 9px; padding: 13px; font-weight: 700; font-size: .95rem;
             font-family: inherit; cursor: pointer; transition: all .2s; margin-top: 8px; }
-        .btn:hover { background: #22d3ee; box-shadow: 0 0 24px rgba(6,182,212,0.3); }
+        .btn:hover { background: var(--accent-dark); box-shadow: 0 0 24px rgba(0,168,232,0.3); }
         .users-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px; justify-items: center; }
         .user-card { background: rgba(22, 22, 22, 0.5); border: 2px solid var(--border); border-radius: 24px; padding: 24px 20px;
             cursor: pointer; text-align: center; transition: all .3s; width: 100%; max-width: 160px; }
-        .user-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 8px 32px rgba(6,182,212,0.2); }
-        .user-card.selected { border-color: var(--accent); background: rgba(6,182,212,0.15); box-shadow: 0 0 24px rgba(6,182,212,0.25); }
+        .user-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 8px 32px rgba(0,168,232,0.2); }
+        .user-card.selected { border-color: var(--accent); background: rgba(0,168,232,0.15); box-shadow: 0 0 24px rgba(0,168,232,0.25); }
         .user-avatar { width: 90px; height: 90px; margin: 0 auto 14px;
-            background: linear-gradient(135deg, var(--accent), #0891b2); border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark)); border-radius: 50%;
             display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 2.2rem;
             border: 3px solid var(--border); object-fit: cover; overflow: hidden; }
         .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
