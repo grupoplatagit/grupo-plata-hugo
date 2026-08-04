@@ -75,14 +75,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 foreach ($value['messages'] ?? [] as $msg) {
                     $from = $msg['from'] ?? '';
                     $body = $msg['text']['body'] ?? '';
-                    $msg_id = $msg['id'] ?? '';
+                    $wa_msg_id = $msg['id'] ?? '';
 
                     try {
                         $db->prepare("
                             INSERT INTO wa_messages
-                            (from_phone, body, msg_id, direction, leido)
-                            VALUES (?, ?, ?, 'in', 0)
-                        ")->execute([$from, $body, $msg_id]);
+                            (from_phone, body, wa_msg_id, direction, leido, created_at, wa_status)
+                            VALUES (?, ?, ?, 'in', 0, datetime('now', 'localtime'), 'received')
+                        ")->execute([$from, $body, $wa_msg_id]);
 
                         @file_put_contents($log_dir . '/whatsapp-webhook.log',
                             date('Y-m-d H:i:s') . " Guardado: $from - $body\n",
