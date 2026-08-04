@@ -62,20 +62,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         FILE_APPEND
     );
 
-    // Procesar mensaje
+    // Procesar mensaje y guardar en BD
+    require_once __DIR__ . '/../app/db.php';
+    $db = getDB();
+
     if ($data && isset($data['entry'])) {
         foreach ($data['entry'] as $entry) {
             foreach ($entry['changes'] ?? [] as $change) {
                 $value = $change['value'] ?? [];
 
-                // Mensajes
+                // Mensajes - guardar en wa_messages
                 foreach ($value['messages'] ?? [] as $msg) {
                     $from = $msg['from'] ?? '';
                     $body = $msg['text']['body'] ?? '';
-                    @file_put_contents($log_dir . '/whatsapp-webhook.log',
-                        "Mensaje: $from - $body\n",
-                        FILE_APPEND
-                    );
+                    $msg_id = $msg['id'] ?? '';
+
+                    try {
+                        $db->prepare("
+                            INSERT INTO wa_messages
+                            (from_phone, body, msg_id, direction, leido)
+                            VALUES (?, ?, ?, 'in', 0)
+                        ")->execute([$from, $body, $msg_id]);
+
+                        @file_put_contents($log_dir . '/whatsapp-webhook.log',
+                            date('Y-m-d H:i:s') . " Guardado: $from - $body\n",
+                            FILE_APPEND
+                        );
+                    } catch (Exception $e) {
+                        @file_put_contents($log_dir . '/whatsapp-webhook.log',
+                            date('Y-m-d H:i:s') . " Error: " . $e->getMessage() . "\n",
+                            FILE_APPEND
+                        );
+                    }
                 }
             }
         }
