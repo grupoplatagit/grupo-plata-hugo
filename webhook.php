@@ -1,12 +1,12 @@
 <?php
-require_once __DIR__ . '/../app/config.php';
-require_once __DIR__ . '/../app/db.php';
-require_once __DIR__ . '/../app/functions.php';
+require_once __DIR__ . '/app/config.php';
+require_once __DIR__ . '/app/db.php';
+require_once __DIR__ . '/app/functions.php';
 
 $db = getDB();
 
 // Log everything
-$dir = __DIR__ . '/../logs';
+$dir = __DIR__ . '/logs';
 if (!is_dir($dir)) mkdir($dir, 0755, true);
 
 // GET - Webhook verification
