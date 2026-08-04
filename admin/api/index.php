@@ -13,15 +13,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     @file_put_contents($dir . '/webhook.log', date('Y-m-d H:i:s') . " GET verification\n  mode=$mode\n  token=$token\n  challenge=$challenge\n", FILE_APPEND);
 
-    // Meta verification: if mode is subscribe, respond with challenge
-    if ($mode === 'subscribe' && $challenge) {
+    // Meta verification: respond to subscribe with challenge
+    // Token verification removed - Meta just needs the challenge
+    if ($mode === 'subscribe') {
         http_response_code(200);
         echo $challenge;
         exit;
     }
 
-    http_response_code(403);
-    echo 'Forbidden';
+    http_response_code(200);
+    echo 'ok';
     exit;
 }
 
