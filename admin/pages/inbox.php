@@ -180,13 +180,12 @@ include __DIR__ . '/../../views/admin/header.php';
         <input type="text" id="convSearch" placeholder="Buscar nombre o mensaje..." oninput="filterConvs(this.value)">
     </div>
     <div class="filter-pills" id="filterTabs">
-        <button class="filter-pill active" data-f="todos"      onclick="setFilterType('label','todos',this)">Todos</button>
-        <button class="filter-pill" data-f="nuevo"             onclick="setFilterType('label','nuevo',this)">Nuevos</button>
-        <button class="filter-pill" data-f="potencial"         onclick="setFilterType('label','potencial',this)">Potencial</button>
-        <button class="filter-pill" data-f="calificado"        onclick="setFilterType('label','calificado',this)">Calificado</button>
-        <button class="filter-pill" data-f="agendado"          onclick="setFilterType('label','agendado',this)">Agendado</button>
-        <button class="filter-pill" data-f="cerrado"           onclick="setFilterType('label','cerrado',this)">Cerrado</button>
-        <button class="filter-pill" data-f="archivadas"        onclick="setFilterType('archive','1',this)">📦 Archivadas</button>
+        <button class="filter-pill active" data-f="todos"      onclick="setFilter('todos',this)">Todos</button>
+        <button class="filter-pill" data-f="nuevo"             onclick="setFilter('nuevo',this)">Nuevos</button>
+        <button class="filter-pill" data-f="potencial"         onclick="setFilter('potencial',this)">Potencial</button>
+        <button class="filter-pill" data-f="calificado"        onclick="setFilter('calificado',this)">Calificado</button>
+        <button class="filter-pill" data-f="agendado"          onclick="setFilter('agendado',this)">Agendado</button>
+        <button class="filter-pill" data-f="cerrado"           onclick="setFilter('cerrado',this)">Cerrado</button>
     </div>
     <div class="conv-list" id="convList"><div class="conv-empty">Cargando...</div></div>
 </div>
@@ -326,8 +325,6 @@ let lastMsgId    = 0;
 let pollTimer    = null;
 let allConvs     = [];
 let activeFilter = 'todos';
-let activeFilterType = 'label'; // 'label' o 'archive'
-let activeArchived = 0; // 0 para activas, 1 para archivadas
 
 // Label config
 const LABELS = {
@@ -349,8 +346,7 @@ const AVATAR_COLORS = {
 
 // ── Conversations ─────────────────────────────────────────────────────────────
 function loadConversations() {
-    const archiveParam = activeFilterType === 'archive' ? `&archived=${activeArchived}` : '';
-    fetch(API + '?action=conversations' + archiveParam)
+    fetch(API + '?action=conversations')
         .then(r => r.json())
         .then(d => {
             allConvs = d.data || [];
@@ -358,22 +354,11 @@ function loadConversations() {
         });
 }
 
-function setFilterType(type, value, btn) {
-    activeFilterType = type;
-    if (type === 'label') {
-        activeFilter = value;
-        activeArchived = 0;
-    } else if (type === 'archive') {
-        activeFilter = 'todos';
-        activeArchived = parseInt(value);
-    }
-    document.querySelectorAll('.filter-pill').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
-    loadConversations();
-}
-
 function setFilter(f, btn) {
-    setFilterType('label', f, btn);
+    activeFilter = f;
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilter();
 }
 
 function applyFilter() {
@@ -442,7 +427,6 @@ function openChat(leadId, nombre, phone, nicho) {
                 <div class="chat-header-sub">${esc(phone)}</div>
             </div>
             ${leadId?`<a href="${ADMIN}/pages/leads.php" class="btn btn-sm" style="background:rgba(6,182,212,.1);color:#06b6d4;border:1px solid rgba(6,182,212,.25);font-size:.7rem;margin-right:4px">Ver lead</a>`:''}
-            <button class="btn btn-sm" onclick="toggleArchive('${esc(phone)}')" style="background:rgba(107,114,128,.1);color:#9ca3af;border:1px solid rgba(107,114,128,.25);font-size:.7rem;margin-right:4px" title="Archivar conversación">📦</button>
         </div>
         <div class="chat-messages" id="msgList"></div>
         <div class="chat-input-wrap">
@@ -1028,32 +1012,6 @@ loadConversations();
 setInterval(loadConversations, 3000);
 
 // Auto-open lead or prospect from URL params
-// ── Archive conversation ────────────────────────────────────────────────────────
-function toggleArchive(phone) {
-    const action = activeArchived === 1 ? 'unarchive' : 'archive';
-    const msg = activeArchived === 1 ? '¿Desarchiver?' : '¿Archivar conversación?';
-
-    if (!confirm(msg)) return;
-
-    fetch('/admin/api/wa-archive.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({from_phone: phone, action: action})
-    })
-    .then(r => r.json())
-    .then(d => {
-        if (d.ok) {
-            showToast(d.msg, 'ok');
-            // Cerrar chat y recargar conversaciones
-            document.getElementById('chatArea').innerHTML = '<div class="chat-empty"><div style="font-size:2.5rem;opacity:.15">&#128383;</div><div style="font-weight:700;font-size:.9rem">Conversación archivada</div></div>';
-            setTimeout(() => loadConversations(), 500);
-        } else {
-            showToast('Error: ' + d.msg);
-        }
-    })
-    .catch(() => showToast('Error de conexión'));
-}
-
 // ── Media modal para imágenes ────────────────────────────────────────────────
 function openMediaModal(mediaId, type, mimeType) {
     const modal = document.createElement('div');

@@ -146,15 +146,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             VALUES (?, ?, ?, 'in', ?, ?, ?, ?, ?, ?, 0, 'received', datetime('now', 'localtime'))
                         ")->execute([$lead_id, $from, $wa_msg_id, $msg_type, $body, $media_id, $mime_type, $file_name, $caption]);
 
-                        // Actualizar wa_conversations para trackear conversación
-                        $db->prepare("
-                            INSERT INTO wa_conversations (from_phone, lead_id, first_message_at, last_message_at)
-                            VALUES (?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'))
-                            ON CONFLICT(from_phone) DO UPDATE SET
-                                last_message_at = datetime('now', 'localtime'),
-                                lead_id = COALESCE(excluded.lead_id, wa_conversations.lead_id)
-                        ")->execute([$from, $lead_id]);
-
                         $log_msg = date('Y-m-d H:i:s') . " MSG IN [$msg_type]: $from - $body (wamid: $wa_msg_id)";
                         if ($media_id) {
                             $log_msg .= " | media_id: " . substr($media_id, 0, 30);

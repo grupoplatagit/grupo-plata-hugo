@@ -246,27 +246,6 @@ function _migrateDB(PDO $pdo): void {
             $pdo->exec("ALTER TABLE wa_messages ADD COLUMN caption TEXT");
         }
     }
-    if (!in_array('wa_conversations', $tables)) {
-        $pdo->exec("CREATE TABLE wa_conversations (
-            id              INTEGER PRIMARY KEY AUTOINCREMENT,
-            from_phone      TEXT NOT NULL UNIQUE,
-            lead_id         INTEGER,
-            wa_name         TEXT,
-            label           TEXT DEFAULT 'nuevo',
-            first_message_at TEXT,
-            last_message_at TEXT,
-            unread_count    INTEGER DEFAULT 0,
-            is_archived     INTEGER DEFAULT 0,
-            created_at      TEXT DEFAULT (datetime('now','localtime')),
-            updated_at      TEXT DEFAULT (datetime('now','localtime'))
-        )");
-    } else {
-        // Agregar columna is_archived si no existe
-        $waConvCols = array_column($pdo->query("PRAGMA table_info(wa_conversations)")->fetchAll(), 'name');
-        if (!in_array('is_archived', $waConvCols)) {
-            $pdo->exec("ALTER TABLE wa_conversations ADD COLUMN is_archived INTEGER DEFAULT 0");
-        }
-    }
     $pdo->exec("CREATE TABLE IF NOT EXISTS login_attempts (
         ip            TEXT PRIMARY KEY,
         attempts      INTEGER DEFAULT 0,
