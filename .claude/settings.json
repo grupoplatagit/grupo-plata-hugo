@@ -28,7 +28,10 @@
       "Bash(git commit *)",
       "Bash(git branch *)",
       "PowerShell(Invoke-WebRequest https://api.github.com/repos/grupoplatagit/grupo-plata-hugo/commits -UseBasicParsing | ConvertFrom-Json | Select-Object -First 5 @{Name='Commit'; Expression={$_.commit.message}}, @{Name='Author'; Expression={$_.commit.author.name}}  | Format-Table)",
-      "Bash(git ls-tree *)"
+      "Bash(git ls-tree *)",
+      "Read(//c/Users/Juanc/Desktop/TRABAJOS/JP MARKET  PRO/**)",
+      "Bash(rm -f public/.htaccess)",
+      "Bash(git rm *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Juanc\\Desktop\\TRABAJOS\\JP MARKET  PRO\\favicon_io",
