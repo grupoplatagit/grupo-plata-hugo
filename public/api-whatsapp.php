@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             foreach ($entry['changes'] ?? [] as $change) {
                 $value = $change['value'] ?? [];
 
-                // Mensajes - guardar en wa_messages
+                // ── Mensajes entrantes ──────────────────────────────────────────
                 foreach ($value['messages'] ?? [] as $msg) {
                     $from = $msg['from'] ?? '';
                     $body = $msg['text']['body'] ?? '';
@@ -85,14 +85,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ")->execute([$from, $body, $wa_msg_id]);
 
                         @file_put_contents($log_dir . '/whatsapp-webhook.log',
-                            date('Y-m-d H:i:s') . " Guardado: $from - $body\n",
+                            date('Y-m-d H:i:s') . " MSG IN: $from - $body (wamid: $wa_msg_id)\n",
                             FILE_APPEND
                         );
                     } catch (Exception $e) {
                         @file_put_contents($log_dir . '/whatsapp-webhook.log',
-                            date('Y-m-d H:i:s') . " Error: " . $e->getMessage() . "\n",
+                            date('Y-m-d H:i:s') . " Error inserting message: " . $e->getMessage() . "\n",
                             FILE_APPEND
                         );
+                    }
+                }
+
+                // ── Status updates (sent, delivered, read, failed) ──────────────
+                foreach ($value['statuses'] ?? [] as $status) {
+                    $wa_msg_id = $status['id'] ?? '';
+                    $new_status = $status['status'] ?? '';
+                    $timestamp = $status['timestamp'] ?? '';
+
+                    if ($wa_msg_id && $new_status) {
+                        try {
+                            // Actualizar estado del mensaje
+                            $db->prepare("
+                                UPDATE wa_messages
+                                SET wa_status = ?, created_at = datetime('now', 'localtime')
+                                WHERE wa_msg_id = ?
+                            ")->execute([$new_status, $wa_msg_id]);
+
+                            @file_put_contents($log_dir . '/whatsapp-webhook.log',
+                                date('Y-m-d H:i:s') . " STATUS: $wa_msg_id → $new_status\n",
+                                FILE_APPEND
+                            );
+                        } catch (Exception $e) {
+                            @file_put_contents($log_dir . '/whatsapp-webhook.log',
+                                date('Y-m-d H:i:s') . " Error updating status: " . $e->getMessage() . "\n",
+                                FILE_APPEND
+                            );
+                        }
                     }
                 }
             }
