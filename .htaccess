@@ -41,6 +41,9 @@ ErrorDocument 404 /public/404.php
     RewriteCond %{REQUEST_FILENAME} \.php$ [NC]
     RewriteRule ^ - [L]
 
+    # IMPORTANTE: Allow admin/api/ (webhook) without rewriting
+    RewriteRule ^admin/api(/.*)?$ - [L]
+
     # Clean URLs for public pages
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
