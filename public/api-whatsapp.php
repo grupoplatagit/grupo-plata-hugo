@@ -79,6 +79,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     if (!$wa_msg_id) continue;
 
+                    // Buscar si existe un lead con este teléfono
+                    // Esto permite que si un contacto sin lead se convierte después,
+                    // los nuevos mensajes se vinculen automáticamente
+                    $lead_id = null;
+                    $lead_stmt = $db->prepare("SELECT id FROM leads WHERE whatsapp = ? LIMIT 1");
+                    $lead_stmt->execute([$from]);
+                    $lead_row = $lead_stmt->fetch();
+                    if ($lead_row) {
+                        $lead_id = $lead_row['id'];
+                    }
+
                     $body = '';
                     $media_id = null;
                     $mime_type = null;
@@ -131,9 +142,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         $db->prepare("
                             INSERT INTO wa_messages
-                            (from_phone, wa_msg_id, direction, message_type, body, media_id, mime_type, file_name, caption, leido, wa_status, created_at)
-                            VALUES (?, ?, 'in', ?, ?, ?, ?, ?, ?, 0, 'received', datetime('now', 'localtime'))
-                        ")->execute([$from, $wa_msg_id, $msg_type, $body, $media_id, $mime_type, $file_name, $caption]);
+                            (lead_id, from_phone, wa_msg_id, direction, message_type, body, media_id, mime_type, file_name, caption, leido, wa_status, created_at)
+                            VALUES (?, ?, ?, 'in', ?, ?, ?, ?, ?, ?, 0, 'received', datetime('now', 'localtime'))
+                        ")->execute([$lead_id, $from, $wa_msg_id, $msg_type, $body, $media_id, $mime_type, $file_name, $caption]);
 
                         $log_msg = date('Y-m-d H:i:s') . " MSG IN [$msg_type]: $from - $body (wamid: $wa_msg_id)";
                         if ($media_id) {
