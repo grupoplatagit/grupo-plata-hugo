@@ -1,28 +1,29 @@
 <?php
 // Webhook for WhatsApp Business API
-// No external dependencies needed for verification
+header('Content-Type: application/json');
 
 $dir = __DIR__ . '/logs';
-if (!is_dir($dir)) mkdir($dir, 0755, true);
+if (!is_dir($dir)) @mkdir($dir, 0755, true);
 
-// GET - Webhook verification
+// GET - Webhook verification (Meta's challenge)
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $mode = $_GET['hub.mode'] ?? '';
     $token = $_GET['hub.verify_token'] ?? '';
     $challenge = $_GET['hub.challenge'] ?? '';
 
-    file_put_contents($dir . '/webhook.log', date('Y-m-d H:i:s') . " GET: mode=$mode, token=$token, challenge=$challenge\n", FILE_APPEND);
+    @file_put_contents($dir . '/webhook.log', date('Y-m-d H:i:s') . " GET verification\n  mode=$mode\n  token=$token\n  challenge=$challenge\n", FILE_APPEND);
 
-    // Respond to Meta's verification
-    if ($mode === 'subscribe' && $challenge) {
-        http_response_code(200);
-        echo $challenge;
-        exit;
+    // Meta verification: if mode is subscribe and token matches, respond with challenge
+    if ($mode === 'subscribe') {
+        if ($token === 'grupo_plata_verify_2024') {
+            http_response_code(200);
+            echo $challenge;
+            exit;
+        }
     }
 
-    // Test response
-    http_response_code(200);
-    echo '1234';
+    http_response_code(403);
+    echo 'Forbidden';
     exit;
 }
 
