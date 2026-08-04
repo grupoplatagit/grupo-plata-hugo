@@ -1,0 +1,12 @@
+# Allow all access to admin/api/
+<Directory "api">
+    Allow from all
+</Directory>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /admin/
+
+    # Allow api folder to be accessed directly
+    RewriteRule ^api(/.*)?$ - [L]
+</IfModule>
