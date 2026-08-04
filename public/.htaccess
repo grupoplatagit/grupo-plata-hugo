@@ -1,0 +1,12 @@
+# Allow webhook.php to be accessed directly
+<FilesMatch "webhook\.php">
+    Allow from all
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /public/
+
+    # Allow webhook.php without rewriting
+    RewriteRule ^webhook\.php$ webhook.php [L]
+</IfModule>
