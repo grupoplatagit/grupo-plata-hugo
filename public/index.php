@@ -49,64 +49,6 @@ $pageTitle = 'Inicio';
     </div>
 </section>
 
-<!-- ====== CLIENTES ====== -->
-<section class="clients-band">
-    <div class="container">
-        <p class="clients-label">Empresas que confían en <?= SITE_NAME ?></p>
-        <div class="clients-row">
-            <div class="client-logo">
-                <span class="client-dot"></span>
-                <span>Grupo Plata</span>
-            </div>
-            <div class="clients-sep"></div>
-            <div class="client-logo">
-                <span class="client-dot"></span>
-                <span>Soy Bonanza</span>
-            </div>
-            <div class="clients-sep"></div>
-            <div class="client-logo">
-                <span class="client-dot"></span>
-                <span>Grupo Azul Plata</span>
-            </div>
-        </div>
-
-        <!-- Partners -->
-        <div class="partners-row">
-            <p class="partners-label">Miembros de:</p>
-            <div class="partners-list">
-
-                <!-- Google Partner -->
-                <div class="partner-badge">
-                    <svg width="28" height="28" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                        <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
-                        <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
-                        <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/>
-                        <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
-                    </svg>
-                    <span class="partner-name">Google Partner</span>
-                </div>
-
-                <div class="partner-sep"></div>
-
-                <!-- Meta Business Partner -->
-                <div class="partner-badge">
-                    <svg width="32" height="20" viewBox="0 0 60 38" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="metaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%"   stop-color="#0082FB"/>
-                                <stop offset="100%" stop-color="#00B2FF"/>
-                            </linearGradient>
-                        </defs>
-                        <path fill="url(#metaGrad)" d="M5.87 19c0 2.4.53 4.24 1.24 5.42.9 1.52 2.25 2.3 3.64 2.3 1.76 0 3.37-.44 6.47-4.77.5-.69 1.01-1.44 1.53-2.22l2.4-3.57c1.67-2.48 3.6-5.25 5.85-7.1C29.27 7.02 31.82 6 34.67 6c4.38 0 8.08 2.42 10.63 6.98C47.83 16.13 49 20.36 49 25c0 3.14-.62 5.44-1.95 7.26C45.78 34.07 44.05 35 42 35c-2.84 0-5.5-1.76-8.18-5.49-.56-.77-1.13-1.62-1.73-2.54l-2.51-3.96c-1.44-2.26-2.84-4.13-4.2-5.46-1.3-1.27-2.45-1.84-3.65-1.84-1.48 0-2.6 1.08-3.37 2.37C17.6 19.28 17 21.2 17 23.5c0 2.74.56 4.36 1.38 5.53.73 1.03 1.89 1.97 4.12 1.97v5C18.8 36 15.8 34.5 13.8 31.9 11.85 29.35 11 25.86 11 22c0-3.68.83-7.11 2.55-9.85C15.31 9.38 17.68 8 20.27 8c2.36 0 4.46.96 6.28 2.72 1.72 1.67 3.27 3.87 5.06 6.65l1.84 2.9c1.5 2.37 2.86 4.24 4.25 5.58.7.67 1.43 1.15 2.3 1.15 1.25 0 2.42-.65 3.25-2.13C44.12 23.46 44.5 21.4 44.5 19c0-4.1-.96-7.4-2.6-9.74C40.24 7.02 38.37 6 36.5 6c-2.3 0-4.1 1.06-5.8 3.14-.77.95-1.58 2.17-2.44 3.6l-1.38 2.34C25.5 10.6 23.1 8 19.5 8c0 0-.11 0-.11 0"/>
-                    </svg>
-                    <span class="partner-name">Meta Business Partner</span>
-                </div>
-
-            </div>
-        </div>
-
-    </div>
-</section>
 
 <!-- ====== NOSOTROS ====== -->
 <section class="section section-alt" id="nosotros">
@@ -164,106 +106,6 @@ $pageTitle = 'Inicio';
     </div>
 </section>
 
-<!-- ====== EQUIPO / FUNDADORES ====== -->
-<section class="section founder-section" id="fundador">
-    <div class="container">
-
-        <div style="text-align:center; max-width:560px; margin:0 auto 72px">
-            <span class="section-tag">Las personas detrás</span>
-            <h2 class="section-title">El <span>equipo</span> fundador</h2>
-            <p class="section-lead" style="margin:0 auto">
-                Estrategia, datos y tecnología en un solo equipo. Dos hermanos con una visión clara:
-                llevar tu negocio al siguiente nivel.
-            </p>
-        </div>
-
-        <div class="founders-duo">
-
-            <!-- Juan Pablo -->
-            <div class="founder-card">
-                <div class="founder-card-header">
-                    <div class="founder-avatar founder-avatar--blue">
-                        <?php if (file_exists(__DIR__ . '/assets/img/equipo/juan-pablo.jpg')): ?>
-                            <img src="<?= BASE_URL ?>/public/assets/img/equipo/juan-pablo.jpg" alt="Juan Pablo">
-                        <?php else: ?>JP<?php endif; ?>
-                    </div>
-                    <div>
-                        <h3 class="founder-name">Juan Pablo</h3>
-                        <p class="founder-role-badge">Co-Fundador & CEO</p>
-                        <div class="founder-status">
-                            <span class="status-dot status-dot--green"></span> Disponible para proyectos
-                        </div>
-                    </div>
-                </div>
-
-                <p class="founder-bio">
-                    Profesional orientado al <strong>marketing digital</strong>, comunicación y soluciones tecnológicas,
-                    con experiencia en <strong>desarrollo web</strong>, <strong>automatización</strong>, campañas digitales,
-                    diseño gráfico y herramientas tecnológicas. Perfil creativo, analítico y adaptable, enfocado en
-                    <strong>optimización de procesos</strong>, experiencia de usuario y estrategias digitales.
-                </p>
-
-                <div class="founder-tags-row">
-                    <span class="tag">Marketing Digital</span>
-                    <span class="tag">Desarrollo Web</span>
-                    <span class="tag">Automatización</span>
-                    <span class="tag">Growth</span>
-                </div>
-
-                <p class="founder-tagline">
-                    +5 años creando soluciones digitales enfocadas en <strong>crecimiento, conversión y automatización</strong>.
-                </p>
-            </div>
-
-            <!-- Divisor -->
-            <div class="founders-divider">
-                <div class="founders-divider-line founders-divider-line--glow"></div>
-            </div>
-
-            <!-- Oswaldo -->
-            <div class="founder-card">
-                <div class="founder-card-header">
-                    <div class="founder-avatar founder-avatar--purple">
-                        <?php if (file_exists(__DIR__ . '/assets/img/equipo/oswaldo.jpg')): ?>
-                            <img src="<?= BASE_URL ?>/public/assets/img/equipo/oswaldo.jpg" alt="Oswaldo Peniche">
-                        <?php else: ?>OR<?php endif; ?>
-                    </div>
-                    <div>
-                        <h3 class="founder-name">Oswaldo Peniche</h3>
-                        <p class="founder-role-badge founder-role-badge--purple">Co-Fundador & CRO</p>
-                        <div class="founder-status">
-                            <span class="status-dot status-dot--blue"></span> Analista Senior CRM
-                        </div>
-                    </div>
-                </div>
-
-                <p class="founder-bio">
-                    Analista Senior de <strong>CRM</strong> con foco en engagement, retención y crecimiento basado en datos.
-                    Lidera la estrategia integral de CRM en el <strong>Hipódromo de Palermo</strong> (Casino Club y plataformas digitales),
-                    diseñando automatizaciones y estrategias de lifecycle orientadas a maximizar activación y recurrencia.
-                </p>
-
-                <div class="founder-tags-row">
-                    <span class="tag tag--purple">CRM</span>
-                    <span class="tag tag--purple">Automatización</span>
-                    <span class="tag tag--purple">Email Marketing</span>
-                    <span class="tag tag--purple">Data-driven</span>
-                </div>
-
-                <div class="founder-mini-stats">
-                    <div><strong>40%</strong><span>Open rate</span></div>
-                    <div><strong>250K+</strong><span>Usuarios/mes</span></div>
-                    <div><strong>0.31%</strong><span>Rebote</span></div>
-                </div>
-
-                <p class="founder-tagline founder-tagline--purple">
-                    CTR 12–15% · Segmentación avanzada · Visión estratégica en entornos <strong>fintech y data-driven</strong>.
-                </p>
-            </div>
-
-        </div>
-    </div>
-</section>
 
 <!-- ====== SERVICIOS ====== -->
 <section class="section" id="servicios">
@@ -274,7 +116,7 @@ $pageTitle = 'Inicio';
                 <h2 class="section-title">Nuestros <span>servicios</span></h2>
             </div>
             <p class="section-lead" style="max-width:320px;color:var(--text);font-weight:500">
-                Creamos sistemas digitales enfocados en crecimiento y conversión.
+                Soluciones de crédito diseñadas para tu perfil financiero.
             </p>
         </div>
 
