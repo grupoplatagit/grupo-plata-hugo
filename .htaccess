@@ -17,8 +17,10 @@ ErrorDocument 404 /public/404.php
     RewriteCond %{HTTPS} off
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-    # Webhook (WhatsApp - must be accessible)
-    RewriteRule ^webhook/?$ public/webhook.php [L]
+    # Webhook (WhatsApp - MUST be first and accessible)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^webhook/?$ public/webhook.php [QSA,L]
 
     # Archivos SEO en raíz
     RewriteRule ^sitemap\.xml$ public/sitemap.xml [L]
