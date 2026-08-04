@@ -229,6 +229,22 @@ function _migrateDB(PDO $pdo): void {
         if (!in_array('wa_status', $waMsgCols)) {
             $pdo->exec("ALTER TABLE wa_messages ADD COLUMN wa_status TEXT");
         }
+        // Agregar columnas multimedia (FASE multimedia)
+        if (!in_array('message_type', $waMsgCols)) {
+            $pdo->exec("ALTER TABLE wa_messages ADD COLUMN message_type TEXT DEFAULT 'text'");
+        }
+        if (!in_array('media_id', $waMsgCols)) {
+            $pdo->exec("ALTER TABLE wa_messages ADD COLUMN media_id TEXT");
+        }
+        if (!in_array('mime_type', $waMsgCols)) {
+            $pdo->exec("ALTER TABLE wa_messages ADD COLUMN mime_type TEXT");
+        }
+        if (!in_array('file_name', $waMsgCols)) {
+            $pdo->exec("ALTER TABLE wa_messages ADD COLUMN file_name TEXT");
+        }
+        if (!in_array('caption', $waMsgCols)) {
+            $pdo->exec("ALTER TABLE wa_messages ADD COLUMN caption TEXT");
+        }
     }
     $pdo->exec("CREATE TABLE IF NOT EXISTS login_attempts (
         ip            TEXT PRIMARY KEY,

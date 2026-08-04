@@ -31,12 +31,20 @@
       "Bash(git ls-tree *)",
       "Read(//c/Users/Juanc/Desktop/TRABAJOS/JP MARKET  PRO/**)",
       "Bash(rm -f public/.htaccess)",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(cp \"c:\\\\Users\\\\Juanc\\\\Desktop\\\\TRABAJOS\\\\jp market pro modelo}\\\\public\\\\webhook.php\" \"c:\\\\Users\\\\Juanc\\\\Desktop\\\\TRABAJOS\\\\jp market pro modelo}\\\\webhook.php\")",
+      "Bash(mkdir -p \"c:\\\\Users\\\\Juanc\\\\Desktop\\\\TRABAJOS\\\\jp market pro modelo}\\\\admin\\\\api\")",
+      "Bash(cp \"c:\\\\Users\\\\Juanc\\\\Desktop\\\\TRABAJOS\\\\jp market pro modelo}\\\\webhook.php\" \"c:\\\\Users\\\\Juanc\\\\Desktop\\\\TRABAJOS\\\\jp market pro modelo}\\\\admin\\\\api\\\\wa-webhook.php\")",
+      "Bash(sqlite3 app/grupo-plata.db \"DELETE FROM leads; DELETE FROM prospectos; DELETE FROM clientes;\")",
+      "Bash(find \"c:\\\\Users\\\\Juanc\\\\Desktop\\\\TRABAJOS\" -name \"*.db\" -o -name \"grupo-plata*\" 2>/dev/null | head -20)",
+      "Read(//c/Users/Juanc/Desktop/TRABAJOS/**)",
+      "Bash(git commit -m ' *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Juanc\\Desktop\\TRABAJOS\\JP MARKET  PRO\\favicon_io",
       "c:\\Users\\Juanc\\Desktop\\TRABAJOS",
-      "C:\\Users\\Juanc\\Desktop\\TRABAJOS\\GP\\2026\\PNG"
+      "C:\\Users\\Juanc\\Desktop\\TRABAJOS\\GP\\2026\\PNG",
+      "c:\\Users\\Juanc\\Desktop\\TRABAJOS\\jp market pro modelo}\\public"
     ]
   }
 }

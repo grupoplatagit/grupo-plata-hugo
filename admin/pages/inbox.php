@@ -510,7 +510,77 @@ function appendMessage(m, list) {
     wrap.className = `msg-wrap ${m.direction}`;
     wrap.dataset.id = m.id;
     const tick = m.direction==='out' ? renderTick(m.wa_status) : '';
-    wrap.innerHTML = `<div class="msg-bubble msg-${m.direction}">${esc(m.body)}<div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div></div>`;
+    const msgType = m.message_type || 'text';
+
+    let messageHTML = '';
+
+    switch (msgType) {
+        case 'text':
+            messageHTML = `<div class="msg-bubble msg-${m.direction}">${esc(m.body)}<div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div></div>`;
+            break;
+
+        case 'audio':
+            messageHTML = `<div class="msg-bubble msg-${m.direction} msg-media">
+                <audio controls style="width:100%;max-width:280px;height:36px">
+                    <source src="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}&type=audio" type="${esc(m.mime_type || 'audio/ogg')}">
+                    Tu navegador no soporta audio.
+                </audio>
+                <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
+            </div>`;
+            break;
+
+        case 'image':
+            messageHTML = `<div class="msg-bubble msg-${m.direction} msg-media">
+                <img src="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}&type=image"
+                     style="max-width:280px;border-radius:8px;cursor:pointer"
+                     onclick="openMediaModal('${esc(m.media_id)}', 'image', '${esc(m.mime_type)}')">
+                ${m.caption ? `<div style="margin-top:6px;font-size:.85rem">${esc(m.caption)}</div>` : ''}
+                <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
+            </div>`;
+            break;
+
+        case 'sticker':
+            messageHTML = `<div class="msg-bubble msg-${m.direction} msg-media" style="background:transparent;border:none">
+                <img src="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}&type=sticker"
+                     style="max-width:200px;height:auto">
+                <div class="msg-time" style="margin-top:4px">${fmtTimeFull(m.created_at)}${tick}</div>
+            </div>`;
+            break;
+
+        case 'document':
+            messageHTML = `<div class="msg-bubble msg-${m.direction} msg-media">
+                <div style="display:flex;gap:10px;align-items:center">
+                    <span style="font-size:1.5rem">📄</span>
+                    <div style="flex:1">
+                        <div style="font-weight:600;font-size:.85rem">${esc(m.file_name || 'Documento')}</div>
+                        ${m.caption ? `<div style="font-size:.75rem;color:var(--muted)">${esc(m.caption)}</div>` : ''}
+                    </div>
+                    <a href="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}&type=document&download=1"
+                       class="btn btn-sm" style="padding:4px 10px;font-size:.7rem">⬇️</a>
+                </div>
+                <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
+            </div>`;
+            break;
+
+        case 'video':
+            messageHTML = `<div class="msg-bubble msg-${m.direction} msg-media">
+                <video controls style="width:100%;max-width:280px;border-radius:8px;max-height:400px">
+                    <source src="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}&type=video" type="${esc(m.mime_type || 'video/mp4')}">
+                    Tu navegador no soporta video.
+                </video>
+                ${m.caption ? `<div style="margin-top:6px;font-size:.85rem">${esc(m.caption)}</div>` : ''}
+                <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
+            </div>`;
+            break;
+
+        default:
+            messageHTML = `<div class="msg-bubble msg-${m.direction}">
+                📎 Tipo no soportado: ${esc(msgType)}
+                <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
+            </div>`;
+    }
+
+    wrap.innerHTML = messageHTML;
     list.appendChild(wrap);
 }
 
@@ -942,6 +1012,28 @@ loadConversations();
 setInterval(loadConversations, 3000);
 
 // Auto-open lead or prospect from URL params
+// ── Media modal para imágenes ────────────────────────────────────────────────
+function openMediaModal(mediaId, type, mimeType) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.style.zIndex = '300';
+    modal.onclick = e => { if (e.target === modal) modal.remove(); };
+
+    let content = '';
+    if (type === 'image') {
+        content = `
+            <div style="display:flex;align-items:center;justify-content:center;height:100%">
+                <img src="${ADMIN}/api/wa-media.php?media_id=${esc(mediaId)}&type=image"
+                     style="max-width:90%;max-height:90%;border-radius:12px">
+            </div>`;
+    } else {
+        content = '<div style="color:white;text-align:center">Media no soportado en preview</div>';
+    }
+
+    modal.innerHTML = content;
+    document.body.appendChild(modal);
+}
+
 (function() {
     const params   = new URLSearchParams(location.search);
     const openId   = params.get('open_lead');

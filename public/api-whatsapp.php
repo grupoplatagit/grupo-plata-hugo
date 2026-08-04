@@ -71,21 +71,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             foreach ($entry['changes'] ?? [] as $change) {
                 $value = $change['value'] ?? [];
 
-                // ── Mensajes entrantes ──────────────────────────────────────────
+                // ── Mensajes entrantes (texto y multimedia) ──────────────────────────────
                 foreach ($value['messages'] ?? [] as $msg) {
                     $from = $msg['from'] ?? '';
-                    $body = $msg['text']['body'] ?? '';
                     $wa_msg_id = $msg['id'] ?? '';
+                    $msg_type = $msg['type'] ?? 'text';
+
+                    if (!$wa_msg_id) continue;
+
+                    $body = '';
+                    $media_id = null;
+                    $mime_type = null;
+                    $file_name = null;
+                    $caption = null;
 
                     try {
+                        switch ($msg_type) {
+                            case 'text':
+                                $body = $msg['text']['body'] ?? '';
+                                break;
+
+                            case 'audio':
+                                $body = '[Nota de voz]';
+                                $media_id = $msg['audio']['id'] ?? '';
+                                $mime_type = $msg['audio']['mime_type'] ?? 'audio/ogg';
+                                break;
+
+                            case 'image':
+                                $body = '[Imagen]';
+                                $media_id = $msg['image']['id'] ?? '';
+                                $mime_type = $msg['image']['mime_type'] ?? 'image/jpeg';
+                                $caption = $msg['image']['caption'] ?? null;
+                                break;
+
+                            case 'sticker':
+                                $body = '[Sticker]';
+                                $media_id = $msg['sticker']['id'] ?? '';
+                                $mime_type = $msg['sticker']['mime_type'] ?? 'image/webp';
+                                break;
+
+                            case 'document':
+                                $file_name = $msg['document']['filename'] ?? null;
+                                $body = '[Documento: ' . ($file_name ?: 'sin nombre') . ']';
+                                $media_id = $msg['document']['id'] ?? '';
+                                $mime_type = $msg['document']['mime_type'] ?? 'application/octet-stream';
+                                $caption = $msg['document']['caption'] ?? null;
+                                break;
+
+                            case 'video':
+                                $body = '[Video]';
+                                $media_id = $msg['video']['id'] ?? '';
+                                $mime_type = $msg['video']['mime_type'] ?? 'video/mp4';
+                                $caption = $msg['video']['caption'] ?? null;
+                                break;
+
+                            default:
+                                $body = '[Tipo de mensaje no soportado: ' . $msg_type . ']';
+                        }
+
                         $db->prepare("
                             INSERT INTO wa_messages
-                            (from_phone, body, wa_msg_id, direction, leido, created_at, wa_status)
-                            VALUES (?, ?, ?, 'in', 0, datetime('now', 'localtime'), 'received')
-                        ")->execute([$from, $body, $wa_msg_id]);
+                            (from_phone, wa_msg_id, direction, message_type, body, media_id, mime_type, file_name, caption, leido, wa_status, created_at)
+                            VALUES (?, ?, 'in', ?, ?, ?, ?, ?, ?, 0, 'received', datetime('now', 'localtime'))
+                        ")->execute([$from, $wa_msg_id, $msg_type, $body, $media_id, $mime_type, $file_name, $caption]);
 
                         @file_put_contents($log_dir . '/whatsapp-webhook.log',
-                            date('Y-m-d H:i:s') . " MSG IN: $from - $body (wamid: $wa_msg_id)\n",
+                            date('Y-m-d H:i:s') . " MSG IN [$msg_type]: $from - $body (wamid: $wa_msg_id)\n",
                             FILE_APPEND
                         );
                     } catch (Exception $e) {

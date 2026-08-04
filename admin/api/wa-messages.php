@@ -61,7 +61,13 @@ if ($action === 'messages') {
 
     if (!empty($_GET['lead_id'])) {
         $leadId = (int)$_GET['lead_id'];
-        $stmt = $db->prepare("SELECT * FROM wa_messages WHERE lead_id = ? AND id > ? ORDER BY created_at ASC");
+        $stmt = $db->prepare("
+            SELECT id, lead_id, from_phone, wa_msg_id, direction, body, leido, wa_status, created_at,
+                   message_type, media_id, mime_type, file_name, caption
+            FROM wa_messages
+            WHERE lead_id = ? AND id > ?
+            ORDER BY created_at ASC
+        ");
         $stmt->execute([$leadId, $since]);
         $db->prepare("UPDATE wa_messages SET leido = 1 WHERE lead_id = ? AND direction = 'in' AND leido = 0")
            ->execute([$leadId]);
@@ -70,7 +76,13 @@ if ($action === 'messages') {
         $lead = $stmt2->fetch();
     } elseif (!empty($_GET['phone'])) {
         $phone = $_GET['phone'];
-        $stmt = $db->prepare("SELECT * FROM wa_messages WHERE lead_id IS NULL AND from_phone = ? AND id > ? ORDER BY created_at ASC");
+        $stmt = $db->prepare("
+            SELECT id, lead_id, from_phone, wa_msg_id, direction, body, leido, wa_status, created_at,
+                   message_type, media_id, mime_type, file_name, caption
+            FROM wa_messages
+            WHERE lead_id IS NULL AND from_phone = ? AND id > ?
+            ORDER BY created_at ASC
+        ");
         $stmt->execute([$phone, $since]);
         $db->prepare("UPDATE wa_messages SET leido = 1 WHERE lead_id IS NULL AND from_phone = ? AND direction = 'in' AND leido = 0")
            ->execute([$phone]);
