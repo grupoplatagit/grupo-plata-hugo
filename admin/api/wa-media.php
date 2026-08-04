@@ -41,30 +41,42 @@ if (!$token) {
     exit('WhatsApp not configured');
 }
 
-// Solicitar información del media a Meta
-$meta_url = "https://graph.instagram.com/v18.0/{$media_id}?access_token={$token}";
+// Solicitar información del media a Meta (PASO 1)
+$meta_url = "https://graph.instagram.com/v18.0/{$media_id}";
 $ch = curl_init($meta_url);
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_TIMEOUT => 10,
     CURLOPT_SSL_VERIFYPEER => true,
+    CURLOPT_HTTPHEADER => [
+        'Authorization: Bearer ' . $token,
+    ],
 ]);
 $resp = curl_exec($ch);
 $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$curl_error = curl_error($ch);
 curl_close($ch);
 
-if ($http_code !== 200 || !$resp) {
+if ($http_code !== 200) {
     http_response_code(502);
-    exit('Failed to get media from Meta');
+    error_log("[wa-media] Meta API error: HTTP $http_code, curl_error: $curl_error, media_id: $media_id");
+    exit('Failed to get media info from Meta (HTTP ' . $http_code . ')');
+}
+
+if (!$resp) {
+    http_response_code(502);
+    error_log("[wa-media] Empty response from Meta, media_id: $media_id");
+    exit('Empty response from Meta');
 }
 
 $meta_data = json_decode($resp, true);
-if (!isset($meta_data['url'])) {
+if (!$meta_data || !isset($meta_data['url'])) {
     http_response_code(502);
-    exit('Invalid Meta response');
+    error_log("[wa-media] Invalid Meta response, media_id: $media_id, response: " . substr($resp, 0, 200));
+    exit('Invalid response from Meta');
 }
 
-// Descargar archivo desde URL de Meta
+// Descargar archivo desde URL de Meta (PASO 2)
 $file_url = $meta_data['url'];
 $ch = curl_init($file_url);
 curl_setopt_array($ch, [
@@ -75,16 +87,31 @@ curl_setopt_array($ch, [
 ]);
 $file_content = curl_exec($ch);
 $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$curl_error = curl_error($ch);
 curl_close($ch);
 
-if ($http_code !== 200 || empty($file_content)) {
+if ($http_code !== 200) {
     http_response_code(502);
-    exit('Failed to download media');
+    error_log("[wa-media] Download error: HTTP $http_code, curl_error: $curl_error, media_id: $media_id");
+    exit('Failed to download media (HTTP ' . $http_code . ')');
+}
+
+if (empty($file_content)) {
+    http_response_code(502);
+    error_log("[wa-media] Empty file content, media_id: $media_id");
+    exit('Empty file from Meta');
+}
+
+// Limpiar output buffer antes de servir binario
+if (ob_get_level()) {
+    ob_end_clean();
 }
 
 // Servir al navegador
-header('Content-Type: ' . ($msg['mime_type'] ?: 'application/octet-stream'));
+$content_type = $msg['mime_type'] ?: 'application/octet-stream';
+header('Content-Type: ' . $content_type);
 header('Content-Length: ' . strlen($file_content));
+header('Cache-Control: public, max-age=3600');
 
 if ($download) {
     $filename = $msg['file_name'] ?: 'media';
@@ -93,6 +120,7 @@ if ($download) {
     header('Content-Disposition: inline');
 }
 
+// Enviar binario
 echo $file_content;
 exit;
 ?>
