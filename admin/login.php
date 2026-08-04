@@ -11,6 +11,8 @@ if (isLoggedIn()) {
 $error   = '';
 $success = '';
 $db = getDB();
+// Eliminar usuarios viejos que no sean Hugo, Roxana, Daniel
+$db->prepare("DELETE FROM admins WHERE email NOT IN ('hugo@grupoplata.com', 'roxana@grupoplata.com', 'daniel@grupoplata.com')")->execute();
 $admins = $db->query("SELECT id, nombre, email FROM admins WHERE activo = 1 ORDER BY nombre")->fetchAll(\PDO::FETCH_ASSOC);
 $selectedEmail = $_POST['email'] ?? $_GET['user'] ?? '';
 
@@ -102,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['forgot'])) {
             border-radius: 9px; padding: 13px; font-weight: 700; font-size: .95rem;
             font-family: inherit; cursor: pointer; transition: all .2s; margin-top: 8px; }
         .btn:hover { background: #22d3ee; box-shadow: 0 0 24px rgba(6,182,212,0.3); }
-        .users-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 28px; }
+        .users-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 28px; }
         .user-card { background: var(--bg); border: 2px solid var(--border); border-radius: 12px; padding: 16px;
             cursor: pointer; text-align: center; transition: all .2s; }
         .user-card:hover { border-color: var(--accent); box-shadow: 0 0 16px rgba(6,182,212,0.1); }
