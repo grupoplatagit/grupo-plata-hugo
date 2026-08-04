@@ -3,6 +3,19 @@
 // Meta enviará parámetros con puntos: hub.mode → PHP los convierte a guiones bajos
 // Este archivo NO requiere login
 
+// Cargar credenciales
+$env_file = __DIR__ . '/../.env.whatsapp';
+if (file_exists($env_file)) {
+    $env = parse_ini_file($env_file);
+    define('WHATSAPP_TOKEN', $env['WHATSAPP_VERIFY_TOKEN'] ?? 'grupo_plata_verify_2024');
+    define('WHATSAPP_ACCESS_TOKEN', $env['WHATSAPP_ACCESS_TOKEN'] ?? '');
+    define('WHATSAPP_PHONE_NUMBER_ID', $env['WHATSAPP_PHONE_NUMBER_ID'] ?? '');
+} else {
+    define('WHATSAPP_TOKEN', 'grupo_plata_verify_2024');
+    define('WHATSAPP_ACCESS_TOKEN', '');
+    define('WHATSAPP_PHONE_NUMBER_ID', '');
+}
+
 // Responder a solicitudes de Meta
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Los parámetros con puntos se convierten a guiones bajos en PHP
@@ -23,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     );
 
     // Verificar Meta
-    if ($mode === 'subscribe' && $token === 'grupo_plata_verify_2024' && $challenge) {
+    if ($mode === 'subscribe' && $token === WHATSAPP_TOKEN && $challenge) {
         http_response_code(200);
         header('Content-Type: text/plain');
         echo $challenge;
