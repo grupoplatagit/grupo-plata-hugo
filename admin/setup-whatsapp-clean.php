@@ -6,7 +6,7 @@ $db = getDB();
 echo "=== PREPARANDO BD PARA GRUPO PLATA ===\n\n";
 
 // 1. Limpiar tablas antiguas
-$tables = ['leads', 'prospectos', 'clientes', 'propuestas'];
+$tables = ['leads', 'prospectos', 'clientes', 'propuestas', 'wa_messages', 'wa_contacts', 'wa_templates'];
 
 foreach ($tables as $table) {
     try {
