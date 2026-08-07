@@ -66,6 +66,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once __DIR__ . '/../app/db.php';
     $db = getDB();
 
+    // Detectar WABA ID del payload de Meta (para soportar múltiples WABAs)
+    $waba_id = $data['entry'][0]['id'] ?? null;
+    if ($waba_id) {
+        @file_put_contents($log_dir . '/whatsapp-webhook.log',
+            date('Y-m-d H:i:s') . " WABA ID detectado: $waba_id\n",
+            FILE_APPEND
+        );
+    }
+
     if ($data && isset($data['entry'])) {
         foreach ($data['entry'] as $entry) {
             foreach ($entry['changes'] ?? [] as $change) {

@@ -61,7 +61,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['forgot'])) {
             $error = 'Credenciales incorrectas.';
         } else {
             $db->prepare("DELETE FROM login_attempts WHERE ip = ?")->execute([$ip]);
-            redirect(ADMIN_URL . '/index.php');
+
+            // Redirigir a panel según email
+            $redirect_url = ADMIN_URL . '/index.php'; // default
+            if ($email === 'roxana@grupoplata.com') {
+                $redirect_url = str_replace('grupoplatasf.com', 'panel-roxana.grupoplatasf.com', ADMIN_URL) . '/index.php';
+            } elseif ($email === 'hugo@grupoplata.com') {
+                $redirect_url = str_replace('grupoplatasf.com', 'panel-hugo.grupoplatasf.com', ADMIN_URL) . '/index.php';
+            }
+
+            redirect($redirect_url);
         }
     }
 } // end POST login
