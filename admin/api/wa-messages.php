@@ -134,8 +134,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = sendWATemplate($token, $phoneId, $toPhone, $tplName, $tplLang, $tplParams);
         if ($result['ok']) {
             $outPhone = $leadId ? 'me' : $toPhone;
-            $db->prepare("INSERT INTO wa_messages (lead_id, from_phone, wa_msg_id, direction, body, leido, wa_status, created_at)
-                          VALUES (?, ?, ?, 'out', ?, 1, 'sent', datetime('now','localtime'))")
+            $db->prepare("INSERT INTO wa_messages (lead_id, from_phone, wa_msg_id, direction, message_type, body, leido, wa_status, created_at)
+                          VALUES (?, ?, ?, 'out', 'text', ?, 1, 'sent', datetime('now','localtime'))")
                ->execute([$leadId ?: null, $outPhone, $result['wa_msg_id'] ?? null, $tplBody]);
             $stmt = $db->prepare("SELECT * FROM wa_messages WHERE id = ?");
             $stmt->execute([$db->lastInsertId()]);
@@ -156,8 +156,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = sendWAMessage($token, $phoneId, $toPhone, $body);
     if ($result['ok']) {
         $outPhone = $leadId ? 'me' : $toPhone;
-        $db->prepare("INSERT INTO wa_messages (lead_id, from_phone, wa_msg_id, direction, body, leido, wa_status, created_at)
-                      VALUES (?, ?, ?, 'out', ?, 1, 'sent', datetime('now','localtime'))")
+        $db->prepare("INSERT INTO wa_messages (lead_id, from_phone, wa_msg_id, direction, message_type, body, leido, wa_status, created_at)
+                      VALUES (?, ?, ?, 'out', 'text', ?, 1, 'sent', datetime('now','localtime'))")
            ->execute([$leadId ?: null, $outPhone, $result['wa_msg_id'] ?? null, $body]);
         $stmt = $db->prepare("SELECT * FROM wa_messages WHERE id = ?");
         $stmt->execute([$db->lastInsertId()]);

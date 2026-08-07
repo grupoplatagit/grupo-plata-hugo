@@ -38,7 +38,8 @@
       "Bash(sqlite3 app/grupo-plata.db \"DELETE FROM leads; DELETE FROM prospectos; DELETE FROM clientes;\")",
       "Bash(find \"c:\\\\Users\\\\Juanc\\\\Desktop\\\\TRABAJOS\" -name \"*.db\" -o -name \"grupo-plata*\" 2>/dev/null | head -20)",
       "Read(//c/Users/Juanc/Desktop/TRABAJOS/**)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(git revert *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Juanc\\Desktop\\TRABAJOS\\JP MARKET  PRO\\favicon_io",
