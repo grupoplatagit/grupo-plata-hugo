@@ -7,6 +7,16 @@ requireLogin();
 
 $db = getDB();
 
+// Crear tabla si no existe
+$db->exec("CREATE TABLE IF NOT EXISTS user_whatsapp_config (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    admin_email     TEXT NOT NULL UNIQUE,
+    waba_id         TEXT,
+    phone_number_id TEXT,
+    created_at      TEXT DEFAULT (datetime('now','localtime')),
+    updated_at      TEXT DEFAULT (datetime('now','localtime'))
+)");
+
 // Obtener admins
 $admins = $db->query("SELECT email, nombre FROM admins WHERE activo = 1 ORDER BY nombre")->fetchAll();
 ?>
