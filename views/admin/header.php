@@ -236,19 +236,19 @@
     </div>
 
     <!-- Modal AREA DEV -->
-    <div id="areaDev Modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:999;align-items:center;justify-content:center">
+    <div id="areaDevModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:999;align-items:center;justify-content:center">
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:32px;max-width:400px;width:90%">
             <h2 style="margin-bottom:20px;color:var(--accent)">🔐 Acceso AREA DEV</h2>
             <div style="margin-bottom:16px">
                 <label style="display:block;font-size:0.8rem;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Contraseña</label>
-                <input type="password" id="areaDev Password" placeholder="Ingresá la contraseña"
+                <input type="password" id="areaDevPassword" placeholder="Ingresá la contraseña"
                     style="width:100%;background:rgba(10,10,10,0.5);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:inherit;font-size:0.95rem">
             </div>
             <div style="display:flex;gap:10px">
                 <button onclick="validateAreaDev()" style="flex:1;background:var(--accent);color:#000;border:none;border-radius:8px;padding:10px;font-weight:600;cursor:pointer;font-family:inherit">Entrar</button>
                 <button onclick="closeAreaDev()" style="flex:1;background:var(--muted);color:#000;border:none;border-radius:8px;padding:10px;font-weight:600;cursor:pointer;font-family:inherit">Cancelar</button>
             </div>
-            <div id="areaDev Error" style="color:#ef4444;font-size:0.85rem;margin-top:12px;display:none"></div>
+            <div id="areaDevError" style="color:#ef4444;font-size:0.85rem;margin-top:12px;display:none"></div>
         </div>
     </div>
 
