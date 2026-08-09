@@ -39,7 +39,18 @@
       "Bash(find \"c:\\\\Users\\\\Juanc\\\\Desktop\\\\TRABAJOS\" -name \"*.db\" -o -name \"grupo-plata*\" 2>/dev/null | head -20)",
       "Read(//c/Users/Juanc/Desktop/TRABAJOS/**)",
       "Bash(git commit -m ' *)",
-      "Bash(git revert *)"
+      "Bash(git revert *)",
+      "Bash(git commit -m 'feat\\(whatsapp\\): add endpoint to register new phone number in Meta *)",
+      "Bash(ssh -p 65002 u145525938@212.85.6.56 \"cd /home/u145525938/public_html && git pull origin main\")",
+      "Bash(cat)",
+      "Bash(chmod +x /tmp/ssh_pull.exp)",
+      "Bash(expect /tmp/ssh_pull.exp)",
+      "Bash(pacman -S --noconfirm sshpass)",
+      "Bash(ssh -p 65002 -o StrictHostKeyChecking=no u145525938@212.85.6.56 \"cd /home/u145525938/public_html && git pull origin main\")",
+      "Bash(git commit -m 'debug: test phone registration endpoint *)",
+      "Bash(git commit -m 'fix\\(whatsapp\\): add missing functions.php import in register-phone endpoint *)",
+      "Bash(git commit -m 'refactor\\(auth\\): remove subdomain redirect logic *)",
+      "Bash(git commit -m 'feat\\(whatsapp\\): add AREA DEV configuration panel *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Juanc\\Desktop\\TRABAJOS\\JP MARKET  PRO\\favicon_io",

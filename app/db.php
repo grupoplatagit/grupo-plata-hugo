@@ -246,6 +246,17 @@ function _migrateDB(PDO $pdo): void {
             $pdo->exec("ALTER TABLE wa_messages ADD COLUMN caption TEXT");
         }
     }
+    // User WhatsApp Configuration
+    if (!in_array('user_whatsapp_config', $tables)) {
+        $pdo->exec("CREATE TABLE user_whatsapp_config (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            admin_email     TEXT NOT NULL UNIQUE,
+            waba_id         TEXT,
+            phone_number_id TEXT,
+            created_at      TEXT DEFAULT (datetime('now','localtime')),
+            updated_at      TEXT DEFAULT (datetime('now','localtime'))
+        )");
+    }
     $pdo->exec("CREATE TABLE IF NOT EXISTS login_attempts (
         ip            TEXT PRIMARY KEY,
         attempts      INTEGER DEFAULT 0,
