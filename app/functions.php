@@ -175,10 +175,12 @@ function sendWAMessage(string $token, string $phoneId, string $to, string $messa
 
 function downloadWAMedia(string $mediaId, string $token, PDO $db, string $logDir = ''): array {
     if (!$mediaId || !$token) {
-        return ['ok' => false, 'msg' => 'media_id o token vacío'];
+        $msg = 'media_id o token vacío';
+        if ($logDir) @file_put_contents("$logDir/whatsapp-media.log", date('Y-m-d H:i:s') . " [ERROR] $msg (mediaId=$mediaId, token=" . (strlen($token) > 0 ? 'OK' : 'VACÍO') . ")\n", FILE_APPEND);
+        return ['ok' => false, 'msg' => $msg];
     }
 
-    if ($logDir) @file_put_contents("$logDir/whatsapp-media.log", date('Y-m-d H:i:s') . " [DESCARGA] Iniciando descarga: $mediaId\n", FILE_APPEND);
+    if ($logDir) @file_put_contents("$logDir/whatsapp-media.log", date('Y-m-d H:i:s') . " [DESCARGA] Iniciando: mediaId=$mediaId, uploadDir=" . (__DIR__ . '/../public_html/uploads/whatsapp') . "\n", FILE_APPEND);
 
     // PASO 1: Obtener URL de Media desde Meta
     $metaUrl = "https://graph.facebook.com/v18.0/{$mediaId}";
@@ -235,12 +237,14 @@ function downloadWAMedia(string $mediaId, string $token, PDO $db, string $logDir
     $filepath = "$uploadDir/$filename";
 
     if (!file_put_contents($filepath, $fileContent)) {
-        if ($logDir) @file_put_contents("$logDir/whatsapp-media.log", date('Y-m-d H:i:s') . " [ERROR] No se pudo guardar archivo\n", FILE_APPEND);
-        return ['ok' => false, 'msg' => 'Error guardando archivo'];
+        $saveError = 'No se pudo guardar archivo en ' . $filepath;
+        if ($logDir) @file_put_contents("$logDir/whatsapp-media.log", date('Y-m-d H:i:s') . " [ERROR] $saveError\n", FILE_APPEND);
+        return ['ok' => false, 'msg' => $saveError];
     }
 
     $internalUrl = '/uploads/whatsapp/' . $filename;
-    if ($logDir) @file_put_contents("$logDir/whatsapp-media.log", date('Y-m-d H:i:s') . " [OK] Archivo almacenado: $internalUrl\n", FILE_APPEND);
+    $logMsg = "[OK] Archivo guardado en $filepath (URL: $internalUrl)";
+    if ($logDir) @file_put_contents("$logDir/whatsapp-media.log", date('Y-m-d H:i:s') . " " . $logMsg . "\n", FILE_APPEND);
 
     return ['ok' => true, 'url' => $internalUrl, 'mime_type' => $mimeType];
 }
