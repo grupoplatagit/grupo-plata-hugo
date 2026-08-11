@@ -163,6 +163,20 @@ include __DIR__ . '/../../views/admin/header.php';
 .tpl-name { font-size:.75rem;font-weight:800;color:#25d366;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px; }
 .tpl-lang { font-size:.68rem;color:var(--muted);margin-bottom:8px; }
 .tpl-preview { font-size:.8rem;color:var(--text);line-height:1.6; }
+
+/* ── Image Lightbox ── */
+.image-lightbox-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;pointer-events:none; }
+.image-lightbox-overlay.active { opacity:1;pointer-events:all; }
+.image-lightbox-container { position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:100%; }
+.image-lightbox-img { max-width:90vw;max-height:90vh;object-fit:contain;border-radius:12px; }
+.image-lightbox-close { position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.3rem;transition:all .2s;font-weight:300; }
+.image-lightbox-close:hover { background:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.5);color:#fff;transform:scale(1.1); }
+
+/* ── Message Image Thumbnail ── */
+.msg-image-thumb { max-width:280px;max-height:320px;width:auto;height:auto;object-fit:contain;border-radius:10px;display:block;cursor:zoom-in;background:var(--bg);border:1px solid var(--border);transition:transform .2s,box-shadow .2s; }
+.msg-image-thumb:hover { transform:scale(1.02);box-shadow:0 4px 12px rgba(0,0,0,0.15); }
+.msg-image-loading { padding:20px;color:var(--muted);font-size:.85rem;display:flex;align-items:center;gap:6px; }
+.msg-image-error { padding:12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:#fca5a5;font-size:.8rem;display:flex;align-items:center;gap:6px; }
 </style>
 
 <div class="inbox-wrap">
@@ -530,9 +544,16 @@ function appendMessage(m, list) {
 
         case 'image':
             messageHTML = `<div class="msg-bubble msg-${m.direction} msg-media">
-                <a href="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:var(--text);text-decoration:none;font-size:.85rem">
-                    📸 Ver imagen
-                </a>
+                <div class="msg-image-loading" id="img-loading-${m.id}">🖼️ Cargando imagen...</div>
+                <img id="img-${m.id}"
+                     src="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}"
+                     alt="Imagen recibida"
+                     class="msg-image-thumb"
+                     style="display:none"
+                     onclick="openImageLightbox('${esc(m.media_id)}', event)"
+                     onerror="showImageError('${m.id}')"
+                     onload="hideImageLoading('${m.id}')">
+                <div class="msg-image-error" id="img-error-${m.id}" style="display:none">⚠️ No se pudo cargar la imagen</div>
                 ${m.caption ? `<div style="margin-top:6px;font-size:.85rem">${esc(m.caption)}</div>` : ''}
                 <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
             </div>`;
@@ -1073,6 +1094,60 @@ function openMediaModal(mediaId, type, mimeType) {
         openChat(null, decodeURIComponent(openName || openPhone), decodeURIComponent(openPhone), '');
     }
 })();
+
+// ── Image Lightbox Functions ──
+function hideImageLoading(msgId) {
+    const loading = document.getElementById(`img-loading-${msgId}`);
+    const img = document.getElementById(`img-${msgId}`);
+    if (loading) loading.style.display = 'none';
+    if (img) img.style.display = 'block';
+}
+
+function showImageError(msgId) {
+    const loading = document.getElementById(`img-loading-${msgId}`);
+    const error = document.getElementById(`img-error-${msgId}`);
+    if (loading) loading.style.display = 'none';
+    if (error) error.style.display = 'flex';
+}
+
+function openImageLightbox(mediaId, event) {
+    event.stopPropagation();
+
+    let overlay = document.getElementById('imageLightboxOverlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'imageLightboxOverlay';
+        overlay.className = 'image-lightbox-overlay';
+        overlay.innerHTML = `
+            <div class="image-lightbox-container">
+                <button class="image-lightbox-close" onclick="closeImageLightbox()">&times;</button>
+                <img id="lightboxImg" src="${ADMIN}/api/wa-media.php?media_id=${mediaId}" alt="Imagen" class="image-lightbox-img">
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        // Close on overlay click
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeImageLightbox();
+        });
+
+        // Close on ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeImageLightbox();
+        });
+    } else {
+        document.getElementById('lightboxImg').src = `${ADMIN}/api/wa-media.php?media_id=${mediaId}`;
+    }
+
+    overlay.classList.add('active');
+}
+
+function closeImageLightbox() {
+    const overlay = document.getElementById('imageLightboxOverlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+    }
+}
 </script>
 
 <?php include __DIR__ . '/../../views/admin/footer.php'; ?>
