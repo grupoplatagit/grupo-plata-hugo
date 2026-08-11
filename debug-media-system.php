@@ -18,7 +18,7 @@ echo "media_status: " . (in_array('media_status', $col_names) ? "✅" : "❌") .
 
 // 3. Verificar directorio de uploads
 echo "<h3>3. Directorio /uploads/whatsapp</h3>";
-$uploadDir = __DIR__ . '/uploads/whatsapp';
+$uploadDir = __DIR__ . '/public_html/uploads/whatsapp';
 if (is_dir($uploadDir)) {
     $files = scandir($uploadDir);
     echo "✅ Directorio existe\n";
