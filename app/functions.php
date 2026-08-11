@@ -225,8 +225,8 @@ function downloadWAMedia(string $mediaId, string $token, PDO $db, string $logDir
         return ['ok' => false, 'msg' => "Descarga falló: HTTP $httpCode"];
     }
 
-    // PASO 3: Guardar archivo localmente
-    $uploadDir = __DIR__ . '/../uploads/whatsapp';
+    // PASO 3: Guardar archivo localmente (DENTRO de public_html para acceso HTTP)
+    $uploadDir = __DIR__ . '/../public_html/uploads/whatsapp';
     @mkdir($uploadDir, 0755, true);
 
     $mimeType = $metaData['mime_type'] ?? 'application/octet-stream';
