@@ -177,6 +177,18 @@ include __DIR__ . '/../../views/admin/header.php';
 .msg-image-thumb:hover { transform:scale(1.02);box-shadow:0 4px 12px rgba(0,0,0,0.15); }
 .msg-image-loading { padding:20px;color:var(--muted);font-size:.85rem;display:flex;align-items:center;gap:6px; }
 .msg-image-error { padding:12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:#fca5a5;font-size:.8rem;display:flex;align-items:center;gap:6px; }
+
+/* ── Message Audio ── */
+.msg-audio { width:100%;max-width:280px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:8px 12px; }
+.msg-audio audio { width:100%;height:32px;outline:none; }
+.msg-audio audio::-webkit-media-controls-panel { background-color:transparent; }
+
+/* ── Message Video Thumbnail ── */
+.msg-video-thumb { max-width:280px;max-height:320px;width:auto;height:auto;object-fit:contain;border-radius:10px;display:block;background:var(--bg);border:1px solid var(--border);cursor:zoom-in; }
+.msg-video { width:100%;max-width:280px;background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden; }
+.msg-video video { width:100%;height:auto;display:block; }
+.msg-video-loading { padding:40px 20px;color:var(--muted);font-size:.85rem;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:10px; }
+.msg-video-error { padding:12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:#fca5a5;font-size:.8rem;display:flex;align-items:center;gap:6px; }
 </style>
 
 <div class="inbox-wrap">
@@ -535,9 +547,13 @@ function appendMessage(m, list) {
 
         case 'audio':
             messageHTML = `<div class="msg-bubble msg-${m.direction} msg-media">
-                <a href="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:var(--text);text-decoration:none;font-size:.85rem">
-                    🔊 Escuchar audio
-                </a>
+                <div class="msg-audio">
+                    <audio controls>
+                        <source src="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" type="${esc(m.mime_type || 'audio/ogg')}">
+                        Tu navegador no soporta audio.
+                    </audio>
+                </div>
+                ${m.caption ? `<div style="margin-top:6px;font-size:.85rem">${esc(m.caption)}</div>` : ''}
                 <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
             </div>`;
             break;
@@ -584,12 +600,33 @@ function appendMessage(m, list) {
 
         case 'video':
             messageHTML = `<div class="msg-bubble msg-${m.direction} msg-media">
-                <a href="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:var(--text);text-decoration:none;font-size:.85rem">
-                    🎬 Ver video
-                </a>
+                <div class="msg-video-loading" id="vid-loading-${m.id}">🎬 Cargando video...</div>
+                <div class="msg-video" id="vid-${m.id}" style="display:none" onclick="openVideoLightbox('${esc(m.media_id)}', '${esc(m.mime_type || 'video/mp4')}', event)">
+                    <video style="cursor:zoom-in">
+                        <source src="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" type="${esc(m.mime_type || 'video/mp4')}">
+                        Tu navegador no soporta video.
+                    </video>
+                </div>
+                <div class="msg-video-error" id="vid-error-${m.id}" style="display:none">⚠️ No se pudo cargar el video</div>
                 ${m.caption ? `<div style="margin-top:6px;font-size:.85rem">${esc(m.caption)}</div>` : ''}
                 <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
             </div>`;
+            // Video ready listener
+            setTimeout(() => {
+                const vid = document.getElementById('vid-${m.id}');
+                const loading = document.getElementById('vid-loading-${m.id}');
+                if (vid && vid.querySelector('video')) {
+                    vid.querySelector('video').addEventListener('loadedmetadata', () => {
+                        if (loading) loading.style.display = 'none';
+                        vid.style.display = 'block';
+                    }, { once: true });
+                    vid.querySelector('video').addEventListener('error', () => {
+                        if (loading) loading.style.display = 'none';
+                        const error = document.getElementById('vid-error-${m.id}');
+                        if (error) error.style.display = 'flex';
+                    }, { once: true });
+                }
+            }, 100);
             break;
 
         default:
@@ -1145,6 +1182,55 @@ function openImageLightbox(mediaId, event) {
 function closeImageLightbox() {
     const overlay = document.getElementById('imageLightboxOverlay');
     if (overlay) {
+        overlay.classList.remove('active');
+    }
+}
+
+// ── Video Lightbox Functions ──
+function openVideoLightbox(mediaId, mimeType, event) {
+    event.stopPropagation();
+
+    let overlay = document.getElementById('videoLightboxOverlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'videoLightboxOverlay';
+        overlay.className = 'image-lightbox-overlay';
+        overlay.innerHTML = `
+            <div class="image-lightbox-container">
+                <button class="image-lightbox-close" onclick="closeVideoLightbox()">&times;</button>
+                <video style="max-width:90vw;max-height:90vh;object-fit:contain;border-radius:12px" controls>
+                    <source src="${ADMIN}/api/wa-media.php?media_id=${mediaId}" type="${mimeType}">
+                    Tu navegador no soporta video.
+                </video>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        // Close on overlay click
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeVideoLightbox();
+        });
+
+        // Close on ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeVideoLightbox();
+        });
+    } else {
+        const video = overlay.querySelector('video');
+        if (video) {
+            video.innerHTML = `<source src="${ADMIN}/api/wa-media.php?media_id=${mediaId}" type="${mimeType}">`;
+            video.load();
+        }
+    }
+
+    overlay.classList.add('active');
+}
+
+function closeVideoLightbox() {
+    const overlay = document.getElementById('videoLightboxOverlay');
+    if (overlay) {
+        const video = overlay.querySelector('video');
+        if (video) video.pause();
         overlay.classList.remove('active');
     }
 }
