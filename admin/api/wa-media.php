@@ -11,7 +11,11 @@ require_once __DIR__ . '/../../app/db.php';
 require_once __DIR__ . '/../../app/auth.php';
 require_once __DIR__ . '/../../app/functions.php';
 
-requireLogin();
+// Permitir acceso si hay sesión válida (sin requerir login para <img> tags)
+if (!isLoggedIn()) {
+    http_response_code(401);
+    exit('Unauthorized');
+}
 
 $db = getDB();
 $media_id = $_GET['media_id'] ?? '';
