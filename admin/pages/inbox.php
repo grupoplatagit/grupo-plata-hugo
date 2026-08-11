@@ -521,19 +521,18 @@ function appendMessage(m, list) {
 
         case 'audio':
             messageHTML = `<div class="msg-bubble msg-${m.direction} msg-media">
-                <audio controls style="width:100%;max-width:280px;height:36px">
-                    <source src="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}&type=audio" type="${esc(m.mime_type || 'audio/ogg')}">
-                    Tu navegador no soporta audio.
-                </audio>
+                <a href="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" download style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:var(--text);text-decoration:none;font-size:.85rem">
+                    🔊 Descargar audio
+                </a>
                 <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
             </div>`;
             break;
 
         case 'image':
             messageHTML = `<div class="msg-bubble msg-${m.direction} msg-media">
-                <img src="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}&type=image"
-                     style="max-width:280px;border-radius:8px;cursor:pointer"
-                     onclick="openMediaModal('${esc(m.media_id)}', 'image', '${esc(m.mime_type)}')">
+                <a href="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" download style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:var(--text);text-decoration:none;font-size:.85rem">
+                    📸 Descargar imagen
+                </a>
                 ${m.caption ? `<div style="margin-top:6px;font-size:.85rem">${esc(m.caption)}</div>` : ''}
                 <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
             </div>`;
@@ -564,10 +563,9 @@ function appendMessage(m, list) {
 
         case 'video':
             messageHTML = `<div class="msg-bubble msg-${m.direction} msg-media">
-                <video controls style="width:100%;max-width:280px;border-radius:8px;max-height:400px">
-                    <source src="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}&type=video" type="${esc(m.mime_type || 'video/mp4')}">
-                    Tu navegador no soporta video.
-                </video>
+                <a href="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" download style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:var(--text);text-decoration:none;font-size:.85rem">
+                    🎬 Descargar video
+                </a>
                 ${m.caption ? `<div style="margin-top:6px;font-size:.85rem">${esc(m.caption)}</div>` : ''}
                 <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
             </div>`;
