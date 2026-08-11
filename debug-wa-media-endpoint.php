@@ -1,22 +1,31 @@
 <?php
-require_once __DIR__ . '/app/config.php';
-require_once __DIR__ . '/app/db.php';
-require_once __DIR__ . '/app/functions.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-$db = getDB();
-$media_id = $_GET['media_id'] ?? '';
+try {
+    require_once __DIR__ . '/app/config.php';
+    require_once __DIR__ . '/app/db.php';
+    require_once __DIR__ . '/app/functions.php';
 
-if (!$media_id) {
-    echo "❌ No se proporcionó media_id. Usa: ?media_id=xxx";
+    $db = getDB();
+    $media_id = $_GET['media_id'] ?? '';
+
+    if (!$media_id) {
+        echo "❌ No se proporcionó media_id. Usa: ?media_id=xxx";
+        exit;
+    }
+
+    echo "<h2>Debug wa-media.php para media_id: $media_id</h2>";
+
+    // Buscar en BD
+    $msg = $db->prepare("SELECT * FROM wa_messages WHERE media_id = ? LIMIT 1")
+        ->execute([$media_id])
+        ->fetch();
+} catch (Exception $e) {
+    echo "❌ Error: " . $e->getMessage() . "<br>";
+    echo "Trace: <pre>" . $e->getTraceAsString() . "</pre>";
     exit;
 }
-
-echo "<h2>Debug wa-media.php para media_id: $media_id</h2>";
-
-// Buscar en BD
-$msg = $db->prepare("SELECT * FROM wa_messages WHERE media_id = ? LIMIT 1")
-    ->execute([$media_id])
-    ->fetch();
 
 if (!$msg) {
     echo "❌ Media NO encontrada en BD<br>";
