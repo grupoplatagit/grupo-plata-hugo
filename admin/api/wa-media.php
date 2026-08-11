@@ -1,21 +1,13 @@
 <?php
 /**
  * Endpoint seguro para servir multimedia de WhatsApp
- * - Autenticación requerida
+ * - Valida media_id en BD (no requiere login)
  * - Access Token se mantiene en backend
- * - Validación de media_id en BD
  */
 
 require_once __DIR__ . '/../../app/config.php';
 require_once __DIR__ . '/../../app/db.php';
-require_once __DIR__ . '/../../app/auth.php';
 require_once __DIR__ . '/../../app/functions.php';
-
-// Permitir acceso si hay sesión válida (sin requerir login para <img> tags)
-if (!isLoggedIn()) {
-    http_response_code(401);
-    exit('Unauthorized');
-}
 
 $db = getDB();
 $media_id = $_GET['media_id'] ?? '';
