@@ -245,6 +245,12 @@ function _migrateDB(PDO $pdo): void {
         if (!in_array('caption', $waMsgCols)) {
             $pdo->exec("ALTER TABLE wa_messages ADD COLUMN caption TEXT");
         }
+        if (!in_array('media_url', $waMsgCols)) {
+            $pdo->exec("ALTER TABLE wa_messages ADD COLUMN media_url TEXT");
+        }
+        if (!in_array('media_status', $waMsgCols)) {
+            $pdo->exec("ALTER TABLE wa_messages ADD COLUMN media_status TEXT DEFAULT 'pending'");
+        }
     }
     // User WhatsApp Configuration
     if (!in_array('user_whatsapp_config', $tables)) {

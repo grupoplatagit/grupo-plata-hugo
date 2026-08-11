@@ -172,3 +172,84 @@ function sendWAMessage(string $token, string $phoneId, string $to, string $messa
     }
     return ['ok' => false, 'msg' => $json['error']['message'] ?? $resp];
 }
+
+function downloadWAMedia(string $mediaId, string $token, PDO $db, string $logDir = ''): array {
+    if (!$mediaId || !$token) {
+        return ['ok' => false, 'msg' => 'media_id o token vacío'];
+    }
+
+    if ($logDir) @file_put_contents("$logDir/whatsapp-media.log", date('Y-m-d H:i:s') . " [DESCARGA] Iniciando descarga: $mediaId\n", FILE_APPEND);
+
+    // PASO 1: Obtener URL de Media desde Meta
+    $metaUrl = "https://graph.facebook.com/v18.0/{$mediaId}";
+    $ch = curl_init($metaUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER     => ['Authorization: Bearer ' . $token],
+        CURLOPT_TIMEOUT        => 10,
+        CURLOPT_SSL_VERIFYPEER => false,
+    ]);
+    $metaResp = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode !== 200) {
+        if ($logDir) @file_put_contents("$logDir/whatsapp-media.log", date('Y-m-d H:i:s') . " [ERROR] Meta API retornó HTTP $httpCode\n", FILE_APPEND);
+        return ['ok' => false, 'msg' => "Meta API error: HTTP $httpCode"];
+    }
+
+    $metaData = json_decode($metaResp, true);
+    if (!$metaData || !isset($metaData['url'])) {
+        if ($logDir) @file_put_contents("$logDir/whatsapp-media.log", date('Y-m-d H:i:s') . " [ERROR] Meta no devolvió URL\n", FILE_APPEND);
+        return ['ok' => false, 'msg' => 'Meta no devolvió URL de media'];
+    }
+
+    $fileUrl = $metaData['url'];
+    if ($logDir) @file_put_contents("$logDir/whatsapp-media.log", date('Y-m-d H:i:s') . " [DESCARGA] URL obtenida de Meta\n", FILE_APPEND);
+
+    // PASO 2: Descargar archivo
+    $ch = curl_init($fileUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_TIMEOUT        => 30,
+        CURLOPT_SSL_VERIFYPEER => false,
+    ]);
+    $fileContent = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode !== 200 || empty($fileContent)) {
+        if ($logDir) @file_put_contents("$logDir/whatsapp-media.log", date('Y-m-d H:i:s') . " [ERROR] Descarga falló: HTTP $httpCode\n", FILE_APPEND);
+        return ['ok' => false, 'msg' => "Descarga falló: HTTP $httpCode"];
+    }
+
+    // PASO 3: Guardar archivo localmente
+    $uploadDir = __DIR__ . '/../uploads/whatsapp';
+    @mkdir($uploadDir, 0755, true);
+
+    $mimeType = $metaData['mime_type'] ?? 'application/octet-stream';
+    $ext = extensionFromMime($mimeType);
+    $filename = $mediaId . '.' . $ext;
+    $filepath = "$uploadDir/$filename";
+
+    if (!file_put_contents($filepath, $fileContent)) {
+        if ($logDir) @file_put_contents("$logDir/whatsapp-media.log", date('Y-m-d H:i:s') . " [ERROR] No se pudo guardar archivo\n", FILE_APPEND);
+        return ['ok' => false, 'msg' => 'Error guardando archivo'];
+    }
+
+    $internalUrl = '/uploads/whatsapp/' . $filename;
+    if ($logDir) @file_put_contents("$logDir/whatsapp-media.log", date('Y-m-d H:i:s') . " [OK] Archivo almacenado: $internalUrl\n", FILE_APPEND);
+
+    return ['ok' => true, 'url' => $internalUrl, 'mime_type' => $mimeType];
+}
+
+function extensionFromMime(string $mime): string {
+    $map = [
+        'image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp',
+        'audio/mpeg' => 'mp3', 'audio/ogg' => 'ogg', 'audio/wav' => 'wav',
+        'video/mp4' => 'mp4', 'video/quicktime' => 'mov',
+        'application/pdf' => 'pdf', 'application/zip' => 'zip',
+    ];
+    return $map[$mime] ?? 'bin';
+}

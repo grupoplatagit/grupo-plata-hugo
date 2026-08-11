@@ -64,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Procesar mensaje y guardar en BD
     require_once __DIR__ . '/../app/db.php';
+    require_once __DIR__ . '/../app/functions.php';
     $db = getDB();
 
     // Detectar WABA ID del payload de Meta (para soportar múltiples WABAs)
@@ -149,15 +150,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 $body = '[Tipo de mensaje no soportado: ' . $msg_type . ']';
                         }
 
+                        $media_url = null;
+                        $media_status = 'pending';
+
+                        // Si hay multimedia, iniciar descarga (asincrónico)
+                        if ($media_id && in_array($msg_type, ['image', 'audio', 'video', 'document', 'sticker'])) {
+                            $token = WHATSAPP_ACCESS_TOKEN;
+                            if ($token) {
+                                $downloadResult = downloadWAMedia($media_id, $token, $db, $log_dir);
+                                if ($downloadResult['ok']) {
+                                    $media_url = $downloadResult['url'];
+                                    $media_status = 'downloaded';
+                                } else {
+                                    $media_status = 'error';
+                                }
+                            }
+                        }
+
                         $db->prepare("
                             INSERT INTO wa_messages
-                            (lead_id, from_phone, wa_msg_id, direction, message_type, body, media_id, mime_type, file_name, caption, leido, wa_status, created_at)
-                            VALUES (?, ?, ?, 'in', ?, ?, ?, ?, ?, ?, 0, 'received', datetime('now', 'localtime'))
-                        ")->execute([$lead_id, $from, $wa_msg_id, $msg_type, $body, $media_id, $mime_type, $file_name, $caption]);
+                            (lead_id, from_phone, wa_msg_id, direction, message_type, body, media_id, mime_type, file_name, caption, media_url, media_status, leido, wa_status, created_at)
+                            VALUES (?, ?, ?, 'in', ?, ?, ?, ?, ?, ?, ?, ?, 0, 'received', datetime('now', 'localtime'))
+                        ")->execute([$lead_id, $from, $wa_msg_id, $msg_type, $body, $media_id, $mime_type, $file_name, $caption, $media_url, $media_status]);
 
                         $log_msg = date('Y-m-d H:i:s') . " MSG IN [$msg_type]: $from - $body (wamid: $wa_msg_id)";
                         if ($media_id) {
-                            $log_msg .= " | media_id: " . substr($media_id, 0, 30);
+                            $log_msg .= " | media_id: " . substr($media_id, 0, 30) . " | status: $media_status";
                         } else if ($msg_type !== 'text') {
                             $log_msg .= " | ⚠️ media_id VACÍO";
                         }
