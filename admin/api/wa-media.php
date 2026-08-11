@@ -42,7 +42,7 @@ if (!$token) {
 }
 
 // Solicitar información del media a Meta (PASO 1)
-$meta_url = "https://graph.instagram.com/v18.0/{$media_id}";
+$meta_url = "https://graph.facebook.com/v23.0/{$media_id}";
 $ch = curl_init($meta_url);
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
