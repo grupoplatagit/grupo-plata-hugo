@@ -521,8 +521,8 @@ function appendMessage(m, list) {
 
         case 'audio':
             messageHTML = `<div class="msg-bubble msg-${m.direction} msg-media">
-                <a href="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" download style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:var(--text);text-decoration:none;font-size:.85rem">
-                    🔊 Descargar audio
+                <a href="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:var(--text);text-decoration:none;font-size:.85rem">
+                    🔊 Escuchar audio
                 </a>
                 <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
             </div>`;
@@ -530,8 +530,8 @@ function appendMessage(m, list) {
 
         case 'image':
             messageHTML = `<div class="msg-bubble msg-${m.direction} msg-media">
-                <a href="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" download style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:var(--text);text-decoration:none;font-size:.85rem">
-                    📸 Descargar imagen
+                <a href="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:var(--text);text-decoration:none;font-size:.85rem">
+                    📸 Ver imagen
                 </a>
                 ${m.caption ? `<div style="margin-top:6px;font-size:.85rem">${esc(m.caption)}</div>` : ''}
                 <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
@@ -563,8 +563,8 @@ function appendMessage(m, list) {
 
         case 'video':
             messageHTML = `<div class="msg-bubble msg-${m.direction} msg-media">
-                <a href="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" download style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:var(--text);text-decoration:none;font-size:.85rem">
-                    🎬 Descargar video
+                <a href="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:var(--text);text-decoration:none;font-size:.85rem">
+                    🎬 Ver video
                 </a>
                 ${m.caption ? `<div style="margin-top:6px;font-size:.85rem">${esc(m.caption)}</div>` : ''}
                 <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
