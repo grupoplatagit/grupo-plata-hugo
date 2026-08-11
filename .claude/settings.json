@@ -50,7 +50,12 @@
       "Bash(git commit -m 'debug: test phone registration endpoint *)",
       "Bash(git commit -m 'fix\\(whatsapp\\): add missing functions.php import in register-phone endpoint *)",
       "Bash(git commit -m 'refactor\\(auth\\): remove subdomain redirect logic *)",
-      "Bash(git commit -m 'feat\\(whatsapp\\): add AREA DEV configuration panel *)"
+      "Bash(git commit -m 'feat\\(whatsapp\\): add AREA DEV configuration panel *)",
+      "Bash(git commit -m 'fix\\(area-dev\\): ensure user_whatsapp_config table exists *)",
+      "Bash(git commit -m 'fix\\(area-dev\\): remove spaces from HTML IDs *)",
+      "Bash(git commit -m 'refactor\\(area-dev\\): simplify page with better error handling *)",
+      "Bash(cp -r \"jp market pro modelo}\" \"jp market pro modelo - BACKUP $\\(date +%Y%m%d-%H%M%S\\)\")",
+      "Bash(sshpass -p \"Gargola.13\" ssh -p 65002 -o StrictHostKeyChecking=no u145525938@212.85.6.56 \"cd /home/u145525938/domains/grupoplatasf.com/public_html && ls -la | head -20\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\Juanc\\Desktop\\TRABAJOS\\JP MARKET  PRO\\favicon_io",

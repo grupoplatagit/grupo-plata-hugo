@@ -987,7 +987,9 @@ function showCtxMenu(e, phone, leadId, nombre='') {
             ? `<div class="ctx-item" onclick="window.location='${ADMIN}/pages/leads.php'">&#128100; Ver lead</div>`
             : `<div class="ctx-item" onclick="closeCtxMenu();openLeadModal('${esc(phone)}')">&#127919; Convertir a lead</div>`
         }
-        <div class="ctx-item" onclick="closeCtxMenu();openChat(${leadId||'null'},'${esc(nombre)}','${esc(phone)}','')">&#128172; Abrir chat</div>`;
+        <div class="ctx-item" onclick="closeCtxMenu();openChat(${leadId||'null'},'${esc(nombre)}','${esc(phone)}','')">&#128172; Abrir chat</div>
+        <div class="ctx-divider"></div>
+        <div class="ctx-item" style="color:#ef4444" onclick="closeCtxMenu();deleteChat('${esc(phone)}',${leadId||'null'},'${esc(nombre)}')">&#128465; Eliminar chat</div>`;
     // Position near cursor
     document.body.appendChild(m);
     const rect = m.getBoundingClientRect();
@@ -1000,6 +1002,28 @@ function showCtxMenu(e, phone, leadId, nombre='') {
 }
 function closeCtxMenu() {
     document.getElementById('ctxMenu')?.remove();
+}
+function deleteChat(phone, leadId, nombre) {
+    if (!confirm(`¿Eliminar todos los mensajes con ${nombre || phone}?`)) return;
+
+    fetch(CTX_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete_chat', phone, lead_id: leadId })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.ok) {
+            alert('✓ Chat eliminado');
+            activePhone = null;
+            activeLeadId = null;
+            document.getElementById('chatArea').innerHTML = '';
+            loadConversations();
+        } else {
+            alert('❌ Error: ' + (data.msg || 'desconocido'));
+        }
+    })
+    .catch(e => alert('Error: ' + e.message));
 }
 function ctxSetLabel(phone, label) {
     closeCtxMenu();

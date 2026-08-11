@@ -95,4 +95,27 @@ if ($action === 'to_lead') {
     exit;
 }
 
+// ── Delete chat (all messages) ────────────────────────────────────────────────
+if ($action === 'delete_chat') {
+    $phone = trim($input['phone'] ?? '');
+    if (!$phone) {
+        echo json_encode(['ok'=>false,'msg'=>'phone requerido']);
+        exit;
+    }
+
+    try {
+        // Eliminar todos los mensajes de este contacto
+        $db->prepare("DELETE FROM wa_messages WHERE from_phone = ?")->execute([$phone]);
+
+        // Opcionalmente, también eliminar el contacto
+        $db->prepare("DELETE FROM wa_contacts WHERE phone = ?")->execute([$phone]);
+
+        echo json_encode(['ok'=>true,'msg'=>'Chat eliminado']);
+        exit;
+    } catch (Exception $e) {
+        echo json_encode(['ok'=>false,'msg'=>$e->getMessage()]);
+        exit;
+    }
+}
+
 echo json_encode(['ok'=>false,'msg'=>'Acción no válida']);
