@@ -228,7 +228,7 @@ function downloadWAMedia(string $mediaId, string $token, PDO $db, string $logDir
     }
 
     // PASO 3: Guardar archivo localmente (DENTRO de public_html para acceso HTTP)
-    $uploadDir = __DIR__ . '/../public_html/uploads/whatsapp';
+    $uploadDir = MEDIA_UPLOAD_DIR;
     @mkdir($uploadDir, 0755, true);
 
     $mimeType = $metaData['mime_type'] ?? 'application/octet-stream';

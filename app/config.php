@@ -12,6 +12,14 @@ if (php_sapi_name() === 'cli-server') {
     unset($_dbHome, $_dbDir);
 }
 
+// Directorio para guardar archivos multimedia
+if (php_sapi_name() === 'cli-server') {
+    define('MEDIA_UPLOAD_DIR', __DIR__ . '/../public_html/uploads/whatsapp');
+} else {
+    // En producción: app/ → ../ → public_html/
+    define('MEDIA_UPLOAD_DIR', __DIR__ . '/../public_html/uploads/whatsapp');
+}
+
 define('SITE_NAME', 'GRUPO PLATA');
 define('SITE_SLOGAN', 'Activos y Pasivos');
 // Auto-detecta la URL según el entorno
