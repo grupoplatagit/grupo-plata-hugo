@@ -207,13 +207,14 @@ function downloadWAMedia(string $mediaId, string $token, PDO $db, string $logDir
     $fileUrl = $metaData['url'];
     if ($logDir) @file_put_contents("$logDir/whatsapp-media.log", date('Y-m-d H:i:s') . " [DESCARGA] URL obtenida de Meta\n", FILE_APPEND);
 
-    // PASO 2: Descargar archivo
+    // PASO 2: Descargar archivo (URL temporal requiere Authorization)
     $ch = curl_init($fileUrl);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_TIMEOUT        => 30,
         CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_HTTPHEADER     => ['Authorization: Bearer ' . $token],
     ]);
     $fileContent = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
