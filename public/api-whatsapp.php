@@ -8,11 +8,9 @@ $env_file = __DIR__ . '/../.env.whatsapp';
 if (file_exists($env_file)) {
     $env = parse_ini_file($env_file);
     define('WHATSAPP_TOKEN', $env['WHATSAPP_VERIFY_TOKEN'] ?? 'grupo_plata_verify_2024');
-    define('WHATSAPP_ACCESS_TOKEN', $env['WHATSAPP_ACCESS_TOKEN'] ?? '');
     define('WHATSAPP_PHONE_NUMBER_ID', $env['WHATSAPP_PHONE_NUMBER_ID'] ?? '');
 } else {
     define('WHATSAPP_TOKEN', 'grupo_plata_verify_2024');
-    define('WHATSAPP_ACCESS_TOKEN', '');
     define('WHATSAPP_PHONE_NUMBER_ID', '');
 }
 
@@ -155,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         // Si hay multimedia, iniciar descarga (asincrónico)
                         if ($media_id && in_array($msg_type, ['image', 'audio', 'video', 'document', 'sticker'])) {
-                            $token = WHATSAPP_ACCESS_TOKEN;
+                            $token = getSetting($db, 'wa_token');
                             if ($token) {
                                 $downloadResult = downloadWAMedia($media_id, $token, $db, $log_dir);
                                 if ($downloadResult['ok']) {
