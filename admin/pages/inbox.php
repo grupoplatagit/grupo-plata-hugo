@@ -540,6 +540,9 @@ function appendMessage(m, list) {
 
     let messageHTML = '';
 
+    // DEBUG: Mostrar tipo de mensaje
+    if (msgType !== 'text') console.log('[MSG DEBUG]', { id: m.id, msgType, media_id: m.media_id, mime_type: m.mime_type });
+
     switch (msgType) {
         case 'text':
             messageHTML = `<div class="msg-bubble msg-${m.direction}">${esc(m.body)}<div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div></div>`;
@@ -635,6 +638,10 @@ function appendMessage(m, list) {
                 <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
             </div>`;
     }
+
+    // DEBUG: Verificar que messageHTML se asignó correctamente
+    if (msgType !== 'text' && !messageHTML) console.warn('[ERROR]', { msgType, messageHTML: 'VACIO' });
+    if (msgType !== 'text') console.log('[HTML]', { msgType, htmlLength: messageHTML.length });
 
     wrap.innerHTML = messageHTML;
     list.appendChild(wrap);
