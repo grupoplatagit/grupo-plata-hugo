@@ -1,102 +1,80 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require_once __DIR__ . '/app/db.php';
 require_once __DIR__ . '/app/functions.php';
 
-$db = getDB();
+try {
+    $db = getDB();
+    echo "<h2>Test Media Download</h2>";
 
-echo "<h2>Test Media Download</h2>";
+    // Obtener un media_id
+    $msg = $db->query("SELECT * FROM wa_messages WHERE message_type = 'image' LIMIT 1")->fetch();
 
-// Obtener un media_id de imágenes
-$msg = $db->prepare("SELECT * FROM wa_messages WHERE message_type = 'image' LIMIT 1")
-    ->execute()
-    ->fetch();
+    if (!$msg) {
+        echo "<p style='color:red'>❌ No hay imágenes en la BD</p>";
 
-if (!$msg) {
-    echo "❌ No hay imágenes en la BD";
-    exit;
+        // Mostrar qué hay
+        $all = $db->query("SELECT COUNT(*) as cnt FROM wa_messages")->fetch();
+        echo "<p>Total mensajes: " . $all['cnt'] . "</p>";
+
+        $types = $db->query("SELECT DISTINCT message_type FROM wa_messages")->fetchAll();
+        echo "<p>Tipos: ";
+        foreach ($types as $t) echo $t['message_type'] . ", ";
+        echo "</p>";
+
+        exit;
+    }
+
+    $media_id = $msg['media_id'];
+    echo "<p>Media ID: <b>$media_id</b></p>";
+    echo "<p>Mime Type: <b>" . $msg['mime_type'] . "</b></p>";
+
+    // Obtener token
+    $token = getSetting($db, 'wa_token');
+    if (!$token) {
+        echo "<p style='color:red'>❌ No hay token configurado</p>";
+        exit;
+    }
+
+    echo "<p>Token: " . substr($token, 0, 20) . "...</p>";
+
+    // Solicitar a Meta
+    $url = "https://graph.facebook.com/v23.0/{$media_id}";
+    echo "<p>URL: $url</p>";
+
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 10,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $token],
+    ]);
+    $resp = curl_exec($ch);
+    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    echo "<p>HTTP Code: <b style='color:" . ($code === 200 ? 'green' : 'red') . "'>$code</b></p>";
+
+    if ($code !== 200) {
+        echo "<p style='color:red'>❌ Meta API error:</p>";
+        echo "<pre>" . htmlspecialchars($resp) . "</pre>";
+        exit;
+    }
+
+    $data = json_decode($resp, true);
+    if (!isset($data['url'])) {
+        echo "<p style='color:red'>❌ No URL en respuesta</p>";
+        echo "<pre>" . print_r($data, true) . "</pre>";
+        exit;
+    }
+
+    echo "<p style='color:green'>✅ Todo OK - URL obtenida de Meta</p>";
+    echo "<p>File URL (primeros 100 chars): " . substr($data['url'], 0, 100) . "</p>";
+
+} catch (Exception $e) {
+    echo "<p style='color:red'><b>ERROR:</b> " . $e->getMessage() . "</p>";
+    echo "<pre>" . $e->getTraceAsString() . "</pre>";
 }
-
-$media_id = $msg['media_id'];
-echo "<p>Testeando con media_id: <b>$media_id</b></p>";
-echo "<hr>";
-
-// Obtener token
-$token = getSetting($db, 'wa_token');
-echo "<p>✓ Token obtenido: " . substr($token, 0, 20) . "...</p>";
-
-// PASO 1: Obtener info de Meta
-echo "<p><b>PASO 1: Solicitar info a Meta</b></p>";
-$meta_url = "https://graph.facebook.com/v23.0/{$media_id}";
-echo "URL: $meta_url<br>";
-
-$ch = curl_init($meta_url);
-curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_TIMEOUT => 10,
-    CURLOPT_SSL_VERIFYPEER => false,
-    CURLOPT_HTTPHEADER => [
-        'Authorization: Bearer ' . $token,
-    ],
-]);
-$resp = curl_exec($ch);
-$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$curl_error = curl_error($ch);
-curl_close($ch);
-
-echo "HTTP Code: <b>$http_code</b><br>";
-if ($curl_error) echo "CURL Error: <b>$curl_error</b><br>";
-
-if ($http_code !== 200) {
-    echo "<p style='color:red'><b>❌ Error en Meta API (HTTP $http_code)</b></p>";
-    echo "<pre>" . htmlspecialchars($resp) . "</pre>";
-    exit;
-}
-
-echo "<p style='color:green'>✓ Meta respondió OK</p>";
-
-$meta_data = json_decode($resp, true);
-echo "<pre>";
-print_r($meta_data);
-echo "</pre>";
-
-if (!isset($meta_data['url'])) {
-    echo "<p style='color:red'><b>❌ Meta no devolvió URL</b></p>";
-    exit;
-}
-
-// PASO 2: Descargar archivo
-echo "<p><b>PASO 2: Descargar archivo de Meta</b></p>";
-$file_url = $meta_data['url'];
-echo "URL: " . substr($file_url, 0, 100) . "...<br>";
-
-$ch = curl_init($file_url);
-curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_TIMEOUT => 30,
-    CURLOPT_FOLLOWLOCATION => true,
-    CURLOPT_SSL_VERIFYPEER => false,
-]);
-$file_content = curl_exec($ch);
-$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$curl_error = curl_error($ch);
-curl_close($ch);
-
-echo "HTTP Code: <b>$http_code</b><br>";
-if ($curl_error) echo "CURL Error: <b>$curl_error</b><br>";
-
-if ($http_code !== 200) {
-    echo "<p style='color:red'><b>❌ Error descargando archivo (HTTP $http_code)</b></p>";
-    exit;
-}
-
-echo "<p style='color:green'>✓ Archivo descargado: " . strlen($file_content) . " bytes</p>";
-
-// Mostrar imagen
-echo "<hr>";
-echo "<p><b>IMAGEN:</b></p>";
-$base64 = base64_encode($file_content);
-$mime = $msg['mime_type'] ?: 'image/jpeg';
-echo "<img src='data:$mime;base64,$base64' style='max-width:300px;border:1px solid #ccc;'>";
-
-echo "<p style='color:green'><b>✅ TODO FUNCIONA OK</b></p>";
 ?>
