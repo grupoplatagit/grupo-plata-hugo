@@ -177,34 +177,39 @@
         :root[data-theme="light"] .sidebar-brand-logo { filter: none !important; }
 
         /* Toggle button */
-        .theme-toggle {
-            background: rgba(6,182,212,0.1);
-            border: 1px solid rgba(6,182,212,0.3);
-            color: #06b6d4;
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            transition: all .2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 40px;
-            height: 40px;
-            font-weight: 600;
+        #themeToggle {
+            background: rgba(6,182,212,0.1) !important;
+            border: 1px solid rgba(6,182,212,0.3) !important;
+            color: #06b6d4 !important;
+            cursor: pointer !important;
+            padding: 6px 10px !important;
+            border-radius: 8px !important;
+            font-size: 1.2rem !important;
+            transition: all .2s !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 40px !important;
+            height: 40px !important;
+            font-family: inherit !important;
+            font-weight: normal !important;
+            line-height: 1 !important;
         }
-        .theme-toggle:hover {
-            background: rgba(6,182,212,0.2);
-            border-color: rgba(6,182,212,0.5);
+        #themeToggle:hover {
+            background: rgba(6,182,212,0.25) !important;
+            border-color: rgba(6,182,212,0.6) !important;
         }
-        :root[data-theme="light"] .theme-toggle {
-            background: rgba(8,145,178,0.15);
-            border-color: rgba(8,145,178,0.4);
-            color: #0891b2;
+        #themeToggle:active {
+            transform: scale(0.95);
         }
-        :root[data-theme="light"] .theme-toggle:hover {
-            background: rgba(8,145,178,0.25);
-            border-color: rgba(8,145,178,0.6);
+        :root[data-theme="light"] #themeToggle {
+            background: rgba(8,145,178,0.15) !important;
+            border-color: rgba(8,145,178,0.4) !important;
+            color: #0891b2 !important;
+        }
+        :root[data-theme="light"] #themeToggle:hover {
+            background: rgba(8,145,178,0.3) !important;
+            border-color: rgba(8,145,178,0.6) !important;
         }
     </style>
 </head>
