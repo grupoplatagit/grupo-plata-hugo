@@ -84,26 +84,31 @@ if ($action === 'to_lead') {
         exit;
     }
 
-    $stmt = $db->prepare("INSERT INTO leads (nombre,email,whatsapp,dni,ciudad,provincia,tipo_credito,monto_solicitado,destino_credito,ingresos_mensuales,situacion_laboral,antiguedad_laboral,cuotas_deseadas,asesor_asignado,prioridad,leido,wa_status)
-                          VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,'sent')");
-    $stmt->execute([
-        $nombre,
-        $email ?: $phone.'@wa.contact',
-        $phone,
-        $dni,
-        $ciudad,
-        $provincia,
-        $tipo_credito,
-        $monto_solicitado,
-        $destino_credito,
-        $ingresos_mensuales,
-        $situacion_laboral,
-        $antiguedad_laboral,
-        $cuotas_deseadas,
-        $asesor_asignado,
-        $prioridad
-    ]);
-    $leadId = $db->lastInsertId();
+    try {
+        $stmt = $db->prepare("INSERT INTO leads (nombre,email,whatsapp,dni,ciudad,provincia,tipo_credito,monto_solicitado,destino_credito,ingresos_mensuales,situacion_laboral,antiguedad_laboral,cuotas_deseadas,asesor_asignado,prioridad,leido,wa_status)
+                              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,'sent')");
+        $stmt->execute([
+            $nombre,
+            $email ?: $phone.'@wa.contact',
+            $phone,
+            $dni,
+            $ciudad,
+            $provincia,
+            $tipo_credito,
+            $monto_solicitado,
+            $destino_credito,
+            $ingresos_mensuales,
+            $situacion_laboral,
+            $antiguedad_laboral,
+            $cuotas_deseadas,
+            $asesor_asignado,
+            $prioridad
+        ]);
+        $leadId = $db->lastInsertId();
+    } catch (Exception $e) {
+        echo json_encode(['ok'=>false,'msg'=>'Error al guardar: '.$e->getMessage()]);
+        exit;
+    }
 
     // Link contact
     $db->prepare("INSERT INTO wa_contacts (phone,lead_id,label,updated_at) VALUES (?,?,'contactado',datetime('now','localtime'))
