@@ -540,9 +540,6 @@ function appendMessage(m, list) {
 
     let messageHTML = '';
 
-    // DEBUG: Mostrar tipo de mensaje
-    if (msgType !== 'text') console.log('[MSG DEBUG]', { id: m.id, msgType, media_id: m.media_id, mime_type: m.mime_type });
-
     switch (msgType) {
         case 'text':
             messageHTML = `<div class="msg-bubble msg-${m.direction}">${esc(m.body)}<div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div></div>`;
@@ -550,12 +547,9 @@ function appendMessage(m, list) {
 
         case 'audio':
             messageHTML = `<div class="msg-bubble msg-${m.direction} msg-media">
-                <div class="msg-audio">
-                    <audio controls>
-                        <source src="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" type="${esc(m.mime_type || 'audio/ogg')}">
-                        Tu navegador no soporta audio.
-                    </audio>
-                </div>
+                <a href="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:var(--text);text-decoration:none;font-size:.85rem;font-weight:600;transition:all .2s">
+                    🎵 Escuchar nota de voz
+                </a>
                 ${m.caption ? `<div style="margin-top:6px;font-size:.85rem">${esc(m.caption)}</div>` : ''}
                 <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
             </div>`;
@@ -603,33 +597,12 @@ function appendMessage(m, list) {
 
         case 'video':
             messageHTML = `<div class="msg-bubble msg-${m.direction} msg-media">
-                <div class="msg-video-loading" id="vid-loading-${m.id}">🎬 Cargando video...</div>
-                <div class="msg-video" id="vid-${m.id}" style="display:none" onclick="openVideoLightbox('${esc(m.media_id)}', '${esc(m.mime_type || 'video/mp4')}', event)">
-                    <video style="cursor:zoom-in">
-                        <source src="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" type="${esc(m.mime_type || 'video/mp4')}">
-                        Tu navegador no soporta video.
-                    </video>
-                </div>
-                <div class="msg-video-error" id="vid-error-${m.id}" style="display:none">⚠️ No se pudo cargar el video</div>
+                <a href="${ADMIN}/api/wa-media.php?media_id=${esc(m.media_id)}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:var(--text);text-decoration:none;font-size:.85rem;font-weight:600;transition:all .2s">
+                    🎬 Ver video
+                </a>
                 ${m.caption ? `<div style="margin-top:6px;font-size:.85rem">${esc(m.caption)}</div>` : ''}
                 <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
             </div>`;
-            // Video ready listener
-            setTimeout(() => {
-                const vid = document.getElementById('vid-${m.id}');
-                const loading = document.getElementById('vid-loading-${m.id}');
-                if (vid && vid.querySelector('video')) {
-                    vid.querySelector('video').addEventListener('loadedmetadata', () => {
-                        if (loading) loading.style.display = 'none';
-                        vid.style.display = 'block';
-                    }, { once: true });
-                    vid.querySelector('video').addEventListener('error', () => {
-                        if (loading) loading.style.display = 'none';
-                        const error = document.getElementById('vid-error-${m.id}');
-                        if (error) error.style.display = 'flex';
-                    }, { once: true });
-                }
-            }, 100);
             break;
 
         default:
@@ -638,10 +611,6 @@ function appendMessage(m, list) {
                 <div class="msg-time">${fmtTimeFull(m.created_at)}${tick}</div>
             </div>`;
     }
-
-    // DEBUG: Verificar que messageHTML se asignó correctamente
-    if (msgType !== 'text' && !messageHTML) console.warn('[ERROR]', { msgType, messageHTML: 'VACIO' });
-    if (msgType !== 'text') console.log('[HTML]', { msgType, htmlLength: messageHTML.length });
 
     wrap.innerHTML = messageHTML;
     list.appendChild(wrap);
@@ -1193,54 +1162,6 @@ function closeImageLightbox() {
     }
 }
 
-// ── Video Lightbox Functions ──
-function openVideoLightbox(mediaId, mimeType, event) {
-    event.stopPropagation();
-
-    let overlay = document.getElementById('videoLightboxOverlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'videoLightboxOverlay';
-        overlay.className = 'image-lightbox-overlay';
-        overlay.innerHTML = `
-            <div class="image-lightbox-container">
-                <button class="image-lightbox-close" onclick="closeVideoLightbox()">&times;</button>
-                <video style="max-width:90vw;max-height:90vh;object-fit:contain;border-radius:12px" controls>
-                    <source src="${ADMIN}/api/wa-media.php?media_id=${mediaId}" type="${mimeType}">
-                    Tu navegador no soporta video.
-                </video>
-            </div>
-        `;
-        document.body.appendChild(overlay);
-
-        // Close on overlay click
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) closeVideoLightbox();
-        });
-
-        // Close on ESC
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeVideoLightbox();
-        });
-    } else {
-        const video = overlay.querySelector('video');
-        if (video) {
-            video.innerHTML = `<source src="${ADMIN}/api/wa-media.php?media_id=${mediaId}" type="${mimeType}">`;
-            video.load();
-        }
-    }
-
-    overlay.classList.add('active');
-}
-
-function closeVideoLightbox() {
-    const overlay = document.getElementById('videoLightboxOverlay');
-    if (overlay) {
-        const video = overlay.querySelector('video');
-        if (video) video.pause();
-        overlay.classList.remove('active');
-    }
-}
 </script>
 
 <?php include __DIR__ . '/../../views/admin/footer.php'; ?>
