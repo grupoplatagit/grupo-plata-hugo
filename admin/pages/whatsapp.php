@@ -17,6 +17,7 @@ function setSetting(PDO $db, string $key, string $value): void {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_config'])) {
     setSetting($db, 'wa_token',        trim($_POST['wa_token']        ?? ''));
     setSetting($db, 'wa_phone_id',     trim($_POST['wa_phone_id']     ?? ''));
+    setSetting($db, 'wa_phone_number', trim($_POST['wa_phone_number'] ?? ''));
     setSetting($db, 'wa_waba_id',      trim($_POST['wa_waba_id']      ?? ''));
     setSetting($db, 'wa_auto_enabled', isset($_POST['wa_auto_enabled']) ? '1' : '0');
     setSetting($db, 'wa_auto_minutes', (string)(int)($_POST['wa_auto_minutes'] ?? 10));
@@ -27,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_config'])) {
 
 $waToken       = getSetting($db, 'wa_token');
 $waPhoneId     = getSetting($db, 'wa_phone_id');
+$waPhoneNumber = getSetting($db, 'wa_phone_number');
 $waWabaId      = getSetting($db, 'wa_waba_id');
 $waAutoEnabled = getSetting($db, 'wa_auto_enabled') === '1';
 $waMinutes     = getSetting($db, 'wa_auto_minutes') ?: '10';
@@ -96,6 +98,15 @@ include __DIR__ . '/../../views/admin/header.php';
                         placeholder="1234567890123456">
                     <small style="color:var(--muted);font-size:.75rem;margin-top:6px;display:block">
                         ID del número en WhatsApp Manager → Números de teléfono
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label>Mi número de teléfono WhatsApp</label>
+                    <input type="text" name="wa_phone_number"
+                        value="<?= htmlspecialchars($waPhoneNumber) ?>"
+                        placeholder="+549115551234">
+                    <small style="color:var(--muted);font-size:.75rem;margin-top:6px;display:block">
+                        Número que aparece en el Inbox (ej: +549115551234)
                     </small>
                 </div>
                 <div class="form-group">

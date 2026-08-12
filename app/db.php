@@ -194,6 +194,7 @@ function _migrateDB(PDO $pdo): void {
         $pdo->exec("INSERT INTO settings (key,value) VALUES
             ('wa_token',''),
             ('wa_phone_id',''),
+            ('wa_phone_number',''),
             ('wa_auto_enabled','0'),
             ('wa_auto_minutes','10'),
             ('wa_auto_message','Hola {nombre} 👋 Vi que completaste el formulario en nuestra web y me interesó tu proyecto. Soy Juan Pablo de JP MARKET — ¿me contás un poco más sobre tu negocio? Me gustaría ver cómo podemos ayudarte a crecer 🚀'),
@@ -205,6 +206,7 @@ function _migrateDB(PDO $pdo): void {
         $defaults = [
             'wa_webhook_token' => 'jpmarket_webhook_2024',
             'wa_waba_id'       => '',
+            'wa_phone_number'  => '',
             'wa_app_secret'    => '',
             'wa_cron_token'    => bin2hex(random_bytes(16)),
         ];

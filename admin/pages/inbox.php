@@ -5,6 +5,9 @@ require_once __DIR__ . '/../../app/auth.php';
 require_once __DIR__ . '/../../app/functions.php';
 requireLogin();
 
+$db = getDB();
+$waPhoneNumber = getSetting($db, 'wa_phone_number');
+
 $pageTitle = 'Inbox WhatsApp';
 include __DIR__ . '/../../views/admin/header.php';
 ?>
@@ -224,6 +227,12 @@ include __DIR__ . '/../../views/admin/header.php';
         <button id="btnSound" onclick="toggleSound()" title="Sonido activado" style="background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.3);color:#25d366;border-radius:8px;width:28px;height:28px;cursor:pointer;font-size:.95rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">🔔</button>
         <button onclick="openNewChat()" title="Nueva conversación" style="background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.3);color:#25d366;border-radius:8px;width:28px;height:28px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;" onmouseover="this.style.background='rgba(37,211,102,.22)'" onmouseout="this.style.background='rgba(37,211,102,.12)'">+</button>
     </div>
+    <?php if ($waPhoneNumber): ?>
+    <div style="padding:12px 14px;border-bottom:1px solid var(--border);background:rgba(37,211,102,.04);font-size:.75rem">
+        <div style="color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:4px">Mi número WhatsApp API (exclusivo panel es:)</div>
+        <div style="color:#25d366;font-weight:700;font-size:.85rem;font-family:monospace;letter-spacing:0.5px"><?= htmlspecialchars($waPhoneNumber) ?></div>
+    </div>
+    <?php endif; ?>
     <div class="conv-search">
         <input type="text" id="convSearch" placeholder="Buscar nombre o mensaje..." oninput="filterConvs(this.value)">
     </div>
