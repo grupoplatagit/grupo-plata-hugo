@@ -97,10 +97,37 @@ function _migrateDB(PDO $pdo): void {
         $pdo->exec("UPDATE clientes SET campana = 0 WHERE nombre LIKE 'C.E.R.Y.D.E%'");
     }
 
+    // Agregar columnas para adaptación crediticia
+    if (!in_array('dni', $cols)) {
+        $pdo->exec("ALTER TABLE clientes ADD COLUMN dni TEXT");
+        $pdo->exec("ALTER TABLE clientes ADD COLUMN provincia TEXT");
+        $pdo->exec("ALTER TABLE clientes ADD COLUMN tipo_credito TEXT");
+        $pdo->exec("ALTER TABLE clientes ADD COLUMN destino_credito TEXT");
+        $pdo->exec("ALTER TABLE clientes ADD COLUMN ingresos_mensuales TEXT");
+        $pdo->exec("ALTER TABLE clientes ADD COLUMN situacion_laboral TEXT");
+        $pdo->exec("ALTER TABLE clientes ADD COLUMN antiguedad_laboral TEXT");
+        $pdo->exec("ALTER TABLE clientes ADD COLUMN cuotas_deseadas TEXT");
+        $pdo->exec("ALTER TABLE clientes ADD COLUMN asesor_asignado TEXT");
+        $pdo->exec("ALTER TABLE clientes ADD COLUMN prioridad TEXT DEFAULT 'media'");
+    }
+
     $leadCols = array_column($pdo->query("PRAGMA table_info(leads)")->fetchAll(), 'name');
     if (!in_array('wa_status', $leadCols)) {
         $pdo->exec("ALTER TABLE leads ADD COLUMN wa_status TEXT DEFAULT 'pending'");
         $pdo->exec("ALTER TABLE leads ADD COLUMN wa_sent_at TEXT");
+    }
+
+    // Agregar columnas para adaptación crediticia
+    if (!in_array('dni', $leadCols)) {
+        $pdo->exec("ALTER TABLE leads ADD COLUMN dni TEXT");
+        $pdo->exec("ALTER TABLE leads ADD COLUMN provincia TEXT");
+        $pdo->exec("ALTER TABLE leads ADD COLUMN ingresos_mensuales TEXT");
+        $pdo->exec("ALTER TABLE leads ADD COLUMN situacion_laboral TEXT");
+        $pdo->exec("ALTER TABLE leads ADD COLUMN antiguedad_laboral TEXT");
+        $pdo->exec("ALTER TABLE leads ADD COLUMN cuotas_deseadas TEXT");
+        $pdo->exec("ALTER TABLE leads ADD COLUMN origen_lead TEXT");
+        $pdo->exec("ALTER TABLE leads ADD COLUMN asesor_asignado TEXT");
+        $pdo->exec("ALTER TABLE leads ADD COLUMN prioridad TEXT DEFAULT 'media'");
     }
 
     // Bot sessions
@@ -288,6 +315,15 @@ function _migrateDB(PDO $pdo): void {
     $prCols = array_column($pdo->query("PRAGMA table_info(prospectos)")->fetchAll(), 'name');
     if (!in_array('instagram', $prCols)) $pdo->exec("ALTER TABLE prospectos ADD COLUMN instagram TEXT");
     if (!in_array('direccion', $prCols)) $pdo->exec("ALTER TABLE prospectos ADD COLUMN direccion TEXT");
+
+    // Agregar columnas para adaptación crediticia
+    if (!in_array('tipo_credito', $prCols)) {
+        $pdo->exec("ALTER TABLE prospectos ADD COLUMN tipo_credito TEXT");
+        $pdo->exec("ALTER TABLE prospectos ADD COLUMN monto_solicitado TEXT");
+        $pdo->exec("ALTER TABLE prospectos ADD COLUMN destino_credito TEXT");
+        $pdo->exec("ALTER TABLE prospectos ADD COLUMN asesor_asignado TEXT");
+        $pdo->exec("ALTER TABLE prospectos ADD COLUMN prioridad TEXT DEFAULT 'media'");
+    }
     $pdo->exec("CREATE TABLE IF NOT EXISTS propuestas (
         id              INTEGER PRIMARY KEY AUTOINCREMENT,
         codigo          TEXT NOT NULL UNIQUE,
