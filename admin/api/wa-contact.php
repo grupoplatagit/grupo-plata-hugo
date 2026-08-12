@@ -11,6 +11,25 @@ $db    = getDB();
 $input = json_decode(file_get_contents('php://input'), true) ?? [];
 $action = $input['action'] ?? $_GET['action'] ?? '';
 
+// ── Save contact (simple, no lead) ────────────────────────────────────────────
+if ($action === 'save_contact') {
+    $phone = trim($input['phone'] ?? '');
+    $wa_name = trim($input['wa_name'] ?? '');
+    if (!$phone) {
+        echo json_encode(['ok'=>false,'msg'=>'phone requerido']);
+        exit;
+    }
+    try {
+        $db->prepare("INSERT INTO wa_contacts (phone,wa_name,updated_at) VALUES (?,?,datetime('now','localtime'))
+                      ON CONFLICT(phone) DO UPDATE SET wa_name=excluded.wa_name, updated_at=excluded.updated_at")
+           ->execute([$phone, $wa_name]);
+        echo json_encode(['ok'=>true,'msg'=>'Contacto guardado']);
+    } catch (Exception $e) {
+        echo json_encode(['ok'=>false,'msg'=>$e->getMessage()]);
+    }
+    exit;
+}
+
 // ── Get contact info ──────────────────────────────────────────────────────────
 if ($action === 'get') {
     $phone = trim($input['phone'] ?? $_GET['phone'] ?? '');

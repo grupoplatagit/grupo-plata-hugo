@@ -68,7 +68,13 @@
       "Bash(git commit -m 'fix: change theme toggle to text button for visibility *)",
       "Bash(git commit -m 'feat: add WhatsApp phone number display in inbox *)",
       "Bash(git commit -m 'refactor: remove Pipeline, Prospectos, and Propuestas from sidebar menu *)",
-      "Bash(git commit -m 'refactor: simplify sidebar and add WhatsApp stats to dashboard *)"
+      "Bash(git commit -m 'refactor: simplify sidebar and add WhatsApp stats to dashboard *)",
+      "Bash(git commit -m 'refactor: clean up dashboard - remove campaign investment, client billing, and recent leads sections *)",
+      "Bash(git commit -m 'fix: improve error handling in lead creation API *)",
+      "Bash(git commit -m 'feat: add sound and browser notifications for new messages *)",
+      "Bash(git commit -m 'feat: add contact scheduling button to inbox *)",
+      "Bash(git commit -m 'fix: improve notification detection to work on any tab *)",
+      "Bash(git commit -m 'fix: save contact without creating full lead record *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Juanc\\Desktop\\TRABAJOS\\JP MARKET  PRO\\favicon_io",

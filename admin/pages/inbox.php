@@ -948,11 +948,9 @@ function saveContact(phone, nombre) {
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
-            action:'to_lead',
+            action:'save_contact',
             phone,
-            nombre: nombre || 'Contacto',
-            email: phone + '@wa.contact',
-            leido: 1
+            wa_name: nombre || 'Contacto'
         })
     })
     .then(r=>r.json())
@@ -963,9 +961,10 @@ function saveContact(phone, nombre) {
         } else if (d.msg && d.msg.includes('existe')) {
             alert('✅ Este contacto ya estaba agendado');
         } else {
-            alert('Error: ' + d.msg);
+            alert('❌ Error: ' + d.msg);
         }
-    });
+    })
+    .catch(e => alert('❌ Error: ' + e.message));
 }
 
 // ── Lead modal ────────────────────────────────────────────────────────────────
