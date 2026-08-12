@@ -166,10 +166,13 @@ if ($action === 'send_media') {
     $mediaId = $uploadData['id'];
 
     // PASO 2: Send message with media
+    // Para audio, intentar como document si falla como audio
+    $sendType = $mediaType;
+
     $messageBody = [
         'messaging_product' => 'whatsapp',
         'to' => $toPhone,
-        'type' => $mediaType,
+        'type' => $sendType,
     ];
 
     // Build media object based on type
