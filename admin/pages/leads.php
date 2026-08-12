@@ -22,20 +22,20 @@ if (isset($_GET['eliminar']) && is_numeric($_GET['eliminar'])) {
 }
 
 // Filtros
-$filtro      = trim($_GET['q'] ?? '');
-$presupuesto = trim($_GET['presupuesto'] ?? '');
-$soloNuevos  = isset($_GET['nuevos']);
+$filtro        = trim($_GET['q'] ?? '');
+$monto         = trim($_GET['monto'] ?? '');
+$soloNuevos    = isset($_GET['nuevos']);
 
 $where  = [];
 $params = [];
 
 if ($filtro) {
-    $where[]  = '(nombre LIKE ? OR email LIKE ? OR nicho LIKE ? OR pais LIKE ?)';
+    $where[]  = '(nombre LIKE ? OR email LIKE ? OR tipo_credito LIKE ? OR provincia LIKE ?)';
     $params   = array_merge($params, ["%$filtro%", "%$filtro%", "%$filtro%", "%$filtro%"]);
 }
-if ($presupuesto) {
-    $where[]  = 'presupuesto = ?';
-    $params[] = $presupuesto;
+if ($monto) {
+    $where[]  = 'monto_solicitado = ?';
+    $params[] = $monto;
 }
 if ($soloNuevos) {
     $where[] = 'leido = 0';
@@ -89,15 +89,15 @@ include __DIR__ . '/../../views/admin/header.php';
 <!-- Filtros -->
 <form method="GET" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px">
     <input type="text" name="q" value="<?= htmlspecialchars($filtro) ?>"
-        placeholder="Buscar por nombre, email, nicho, país..."
+        placeholder="Buscar por nombre, email, tipo de crédito, provincia..."
         style="flex:1;min-width:220px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:.9rem;">
 
-    <select name="presupuesto" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:.9rem;">
-        <option value="">Todos los presupuestos</option>
-        <option value="$500 - $1,000 USD"   <?= $presupuesto === '$500 - $1,000 USD'   ? 'selected':'' ?>>$500 – $1K</option>
-        <option value="$1,000 - $3,000 USD" <?= $presupuesto === '$1,000 - $3,000 USD' ? 'selected':'' ?>>$1K – $3K</option>
-        <option value="$3,000 - $5,000 USD" <?= $presupuesto === '$3,000 - $5,000 USD' ? 'selected':'' ?>>$3K – $5K</option>
-        <option value="$5,000+ USD"         <?= $presupuesto === '$5,000+ USD'         ? 'selected':'' ?>>$5K+</option>
+    <select name="monto" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:.9rem;">
+        <option value="">Todos los montos</option>
+        <option value="$10.000 - $25.000" <?= $monto === '$10.000 - $25.000' ? 'selected':'' ?>>$10K – $25K</option>
+        <option value="$25.000 - $50.000" <?= $monto === '$25.000 - $50.000' ? 'selected':'' ?>>$25K – $50K</option>
+        <option value="$50.000 - $100.000" <?= $monto === '$50.000 - $100.000' ? 'selected':'' ?>>$50K – $100K</option>
+        <option value="$100.000+" <?= $monto === '$100.000+' ? 'selected':'' ?>>$100K+</option>
     </select>
 
     <label style="display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.9rem;cursor:pointer">
@@ -117,10 +117,10 @@ include __DIR__ . '/../../views/admin/header.php';
                     <th></th>
                     <th>Nombre</th>
                     <th>Email / WhatsApp</th>
-                    <th>Nicho</th>
-                    <th>Ciudad / País</th>
-                    <th>Presupuesto</th>
-                    <th>Objetivo</th>
+                    <th>Tipo de Crédito</th>
+                    <th>Provincia</th>
+                    <th>Monto Solicitado</th>
+                    <th>Destino</th>
                     <th>Fecha</th>
                     <th style="color:#25d366">&#128383; WhatsApp</th>
                     <th>Acciones</th>
@@ -152,13 +152,10 @@ include __DIR__ . '/../../views/admin/header.php';
                             <div style="font-size:.8rem;color:#25d366"><?= htmlspecialchars($l['whatsapp']) ?></div>
                         <?php endif; ?>
                     </td>
-                    <td><?= htmlspecialchars($l['nicho']) ?></td>
-                    <td>
-                        <div><?= htmlspecialchars($l['ciudad']) ?></div>
-                        <div style="font-size:.8rem;color:var(--muted)"><?= htmlspecialchars($l['pais']) ?></div>
-                    </td>
-                    <td><span style="color:#06b6d4;font-weight:600;font-size:.85rem"><?= htmlspecialchars($l['presupuesto']) ?></span></td>
-                    <td style="font-size:.85rem;color:var(--muted)"><?= htmlspecialchars($l['objetivo'] ?: '—') ?></td>
+                    <td><?= htmlspecialchars($l['tipo_credito'] ?: '—') ?></td>
+                    <td><?= htmlspecialchars($l['provincia'] ?: '—') ?></td>
+                    <td><span style="color:#06b6d4;font-weight:600;font-size:.85rem"><?= htmlspecialchars($l['monto_solicitado'] ?: '—') ?></span></td>
+                    <td style="font-size:.85rem;color:var(--muted)"><?= htmlspecialchars($l['destino_credito'] ?: '—') ?></td>
                     <td style="font-size:.82rem;color:var(--muted)"><?= formatDate($l['created_at']) ?></td>
 
                     <!-- WhatsApp column -->
