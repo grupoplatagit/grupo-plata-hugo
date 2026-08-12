@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= isset($pageTitle) ? htmlspecialchars($pageTitle) . ' | ' : '' ?>Admin JP MARKET</title>
+    <title><?= isset($pageTitle) ? htmlspecialchars($pageTitle) . ' | ' : '' ?>Grupo Plata Admin</title>
     <link rel="icon" type="image/png" sizes="32x32" href="<?= BASE_URL ?>/public/assets/img/favicon-32x32.png">
     <link rel="shortcut icon" href="<?= BASE_URL ?>/public/assets/img/favicon.ico">
     <style>
@@ -151,9 +151,9 @@
 
 <aside class="sidebar">
     <div class="sidebar-brand">
-        <img src="<?= BASE_URL ?>/public/assets/img/logo.png" alt="JP MARKET" class="sidebar-brand-logo">
+        <img src="<?= BASE_URL ?>/public/assets/img/logo.png" alt="Grupo Plata" class="sidebar-brand-logo">
         <div>
-            <div style="font-size:.85rem;font-weight:800;color:var(--text)">JP MARKET</div>
+            <div style="font-size:.85rem;font-weight:800;color:var(--text)">GRUPO PLATA</div>
             <div class="sidebar-brand-text">Panel Admin</div>
         </div>
     </div>

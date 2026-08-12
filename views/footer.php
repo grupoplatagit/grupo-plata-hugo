@@ -41,7 +41,7 @@
             <div class="footer-col">
                 <h4>Contacto</h4>
                 <ul>
-                    <li><a href="mailto:info@jpmarket.com">info@jpmarket.com</a></li>
+                    <li><a href="mailto:info@grupoplata.com">info@grupoplata.com</a></li>
                     <li><a href="#contacto">Formulario de contacto</a></li>
                     <li><a href="#">Buenos Aires, Argentina</a></li>
                 </ul>
@@ -49,7 +49,7 @@
         </div>
 
         <div class="footer-bottom">
-            <p>&copy; <?= date('Y') ?> JP MARKET. Todos los derechos reservados.</p>
+            <p>&copy; <?= date('Y') ?> GRUPO PLATA. Todos los derechos reservados.</p>
             <div style="display:flex;align-items:center;gap:20px">
                 <span class="footer-slogan">Empower your mind</span>
                 <a href="<?= ADMIN_URL ?>/login.php" style="font-size:.75rem;color:var(--text-muted);opacity:.5;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5">&#128274; Admin</a>
