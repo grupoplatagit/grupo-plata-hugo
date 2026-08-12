@@ -443,6 +443,47 @@ let lastMsgId    = 0;
 let pollTimer    = null;
 let allConvs     = [];
 let activeFilter = 'todos';
+let prevConvCount = 0;
+let soundEnabled = true;
+
+// Notification & sound functions
+function playNotificationSound() {
+    if (!soundEnabled) return;
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.value = 800;
+    oscillator.type = 'sine';
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.3);
+}
+
+function showNotification(titulo, mensaje, icon = '&#128383;') {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(titulo, {
+            body: mensaje,
+            icon: '<?= BASE_URL ?>/public/assets/img/logo.png',
+            badge: '<?= BASE_URL ?>/public/assets/img/favicon.ico',
+            tag: 'wa-notification'
+        });
+    }
+}
+
+function requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+}
+
+// Request notification permission on load
+requestNotificationPermission();
 
 // Label config
 const LABELS = {
@@ -475,7 +516,21 @@ function loadConversations() {
     fetch(API + '?action=conversations')
         .then(r => r.json())
         .then(d => {
-            allConvs = d.data || [];
+            const newConvs = d.data || [];
+            const currentCount = newConvs.length;
+
+            // Detectar nuevas conversaciones
+            if (prevConvCount > 0 && currentCount > prevConvCount) {
+                const newConv = newConvs[0];
+                playNotificationSound();
+                showNotification(
+                    '📱 Nuevo mensaje',
+                    (newConv.nombre || 'Nuevo contacto') + ': ' + (newConv.last_msg || '')
+                );
+            }
+
+            prevConvCount = currentCount;
+            allConvs = newConvs;
             applyFilter();
         });
 }
