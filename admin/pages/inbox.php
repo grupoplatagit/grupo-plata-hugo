@@ -362,7 +362,7 @@ include __DIR__ . '/../../views/admin/header.php';
 </div>
 
 <!-- FFmpeg.js para convertir WebM → OGG en el navegador -->
-<script async src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/ffmpeg.min.js"></script>
+<script async src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/ffmpeg.min.js"></script>
 
 <script>
 const API      = '<?= ADMIN_URL ?>/api/wa-messages.php';
