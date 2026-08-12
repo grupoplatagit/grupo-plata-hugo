@@ -180,6 +180,16 @@ function handleBotMessage(PDO $db, string $phone, string $message, string $token
 
         $nombre = ucwords(mb_strtolower(trim($message)));
         updateBotSession($db, $phone, ['estado' => 'email', 'nombre' => $nombre]);
+
+        // Auto-agenda el contacto
+        try {
+            $db->prepare("INSERT INTO wa_contacts (phone, wa_name, updated_at) VALUES (?, ?, datetime('now','localtime'))
+                          ON CONFLICT(phone) DO UPDATE SET wa_name=excluded.wa_name, updated_at=excluded.updated_at")
+               ->execute([$phone, $nombre]);
+        } catch (Exception $e) {
+            // Silently fail if contact save fails
+        }
+
         botSendMessage($token, $phoneId, $phone,
             "Un gusto, *{$nombre}*! 🤝\n\n¿Tenés un email de contacto?\n_(Escribí \"no\" para omitir)_"
         );
