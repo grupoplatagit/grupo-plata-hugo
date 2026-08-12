@@ -15,6 +15,10 @@ $facturacionMes  = $db->query('SELECT COALESCE(SUM(monto),0) FROM clientes WHERE
 $clientesConMonto = $db->query('SELECT * FROM clientes WHERE monto > 0 AND activo = 1 ORDER BY monto DESC')->fetchAll();
 $ultimosLeads    = $db->query('SELECT * FROM leads ORDER BY created_at DESC LIMIT 5')->fetchAll();
 
+// WhatsApp conversations this month
+$waConversacionesMes = $db->query("SELECT COUNT(DISTINCT phone) FROM wa_contacts WHERE strftime('%Y-%m', updated_at) = strftime('%Y-%m', 'now','localtime')")->fetchColumn();
+$waConversacionesTotales = $db->query('SELECT COUNT(DISTINCT phone) FROM wa_contacts')->fetchColumn();
+
 $dolar        = getDolarRate();
 $dolarOficial = $dolar['oficial']['venta'] ?? null;
 $dolarBlue    = $dolar['blue']['venta']    ?? null;
@@ -56,6 +60,14 @@ include __DIR__ . '/../views/admin/header.php';
     <div class="stat-card">
         <div class="val"><?= $totalLeads ?></div>
         <div class="lbl">Total leads</div>
+    </div>
+    <div class="stat-card" style="border-color:rgba(37,211,102,0.35)">
+        <div class="val" style="color:#25d366"><?= $waConversacionesMes ?></div>
+        <div class="lbl">Conversaciones WA este mes &#128383;</div>
+    </div>
+    <div class="stat-card">
+        <div class="val"><?= $waConversacionesTotales ?></div>
+        <div class="lbl">Total conversaciones WA</div>
     </div>
     <div class="stat-card">
         <div class="val"><?= $clientesActivos ?></div>
