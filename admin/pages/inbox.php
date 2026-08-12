@@ -361,8 +361,8 @@ include __DIR__ . '/../../views/admin/header.php';
     </div>
 </div>
 
-<!-- RecordRTC para grabar OGG/Opus nativamente -->
-<script src="https://cdn.jsdelivr.net/npm/recordrtc@latest/RecordRTC.min.js"></script>
+<!-- FFmpeg.js para convertir WebM → OGG en el navegador -->
+<script async src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/ffmpeg.min.js"></script>
 
 <script>
 const API      = '<?= ADMIN_URL ?>/api/wa-messages.php';
@@ -1151,29 +1151,46 @@ async function toggleRecorder() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-        // RecordRTC graba DIRECTAMENTE en OGG/Opus
-        // Sin necesidad de conversión artificial
-        console.log('🎙️ Usando RecordRTC para grabar OGG/Opus nativamente');
+        // Usar MediaRecorder nativo (graba WebM)
+        mediaRecorder = new MediaRecorder(stream);
+        recordingChunks = [];
 
-        mediaRecorder = RecordRTC(stream, {
-            type: 'audio',
-            mimeType: 'audio/ogg',
-            numberOfAudioChannels: 1,
-            bufferSize: 4096,
-            audioBitsPerSecond: 128000,
-        });
+        console.log('🎙️ Grabando audio...');
 
-        mediaRecorder.onstop = () => {
-            // RecordRTC genera OGG REAL, no WebM disfrazado
-            mediaRecorder.getBlob(blob => {
+        mediaRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) recordingChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = async () => {
+            console.log('🔄 Convirtiendo WebM → OGG con FFmpeg...');
+
+            // Crear Blob WebM
+            const webmBlob = new Blob(recordingChunks, { type: 'audio/webm' });
+
+            try {
+                // Cargar FFmpeg
+                const FFmpeg = FFmpeg.FFmpeg;
+                const fetchFile = FFmpeg.fetchFile;
+                const ffmpeg = new FFmpeg.FFmpeg();
+
+                if (!ffmpeg.isLoaded()) {
+                    await ffmpeg.load();
+                }
+
+                // Convertir WebM → OGG
+                await ffmpeg.writeFile('input.webm', await fetchFile(webmBlob));
+                await ffmpeg.exec(['-i', 'input.webm', '-c:a', 'libopus', '-b:a', '128k', 'output.ogg']);
+                const data = await ffmpeg.readFile('output.ogg');
+
+                // Crear Blob OGG
+                const oggBlob = new Blob([data.buffer], { type: 'audio/ogg' });
                 const filename = `nota-voz-${Date.now()}.ogg`;
-                const file = new File([blob], filename, { type: 'audio/ogg' });
+                const file = new File([oggBlob], filename, { type: 'audio/ogg' });
 
-                console.log('✅ AUDIO RECORDING EXITOSO');
-                console.log('  filename:', filename);
-                console.log('  mime type:', 'audio/ogg (OGG/Opus real)');
-                console.log('  size:', file.size, 'bytes');
-                console.log('  ready to send to WhatsApp Cloud API');
+                console.log('✅ CONVERSIÓN EXITOSA');
+                console.log('  WebM original:', webmBlob.size, 'bytes');
+                console.log('  OGG convertido:', file.size, 'bytes');
+                console.log('  MIME type: audio/ogg');
 
                 selectedMedia = {
                     file: file,
@@ -1184,11 +1201,19 @@ async function toggleRecorder() {
                 };
 
                 showRecordingPreview(file);
-                stream.getTracks().forEach(track => track.stop());
-            });
+
+                // Limpiar FFmpeg
+                await ffmpeg.deleteFile('input.webm');
+                await ffmpeg.deleteFile('output.ogg');
+            } catch (convError) {
+                console.error('❌ Error en conversión:', convError);
+                alert('Error al convertir audio: ' + convError.message);
+            }
+
+            stream.getTracks().forEach(track => track.stop());
         };
 
-        mediaRecorder.startRecording();
+        mediaRecorder.start();
         recordingStartTime = Date.now();
         document.getElementById('recorderControls').classList.add('active');
 
@@ -1200,7 +1225,7 @@ async function toggleRecorder() {
                 `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }, 100);
     } catch (error) {
-        alert('Error: ' + error.message);
+        alert('Error al acceder al micrófono: ' + error.message);
     }
 }
 
