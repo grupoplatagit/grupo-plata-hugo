@@ -74,7 +74,11 @@
       "Bash(git commit -m 'feat: add sound and browser notifications for new messages *)",
       "Bash(git commit -m 'feat: add contact scheduling button to inbox *)",
       "Bash(git commit -m 'fix: improve notification detection to work on any tab *)",
-      "Bash(git commit -m 'fix: save contact without creating full lead record *)"
+      "Bash(git commit -m 'fix: save contact without creating full lead record *)",
+      "Bash(git commit -m 'feat: register service worker for background notifications *)",
+      "Bash(git commit -m 'feat: auto-schedule contacts when bot gets name *)",
+      "Bash(xargs grep -l \"wa_messages\\\\|INSERT.*wa_messages\")",
+      "Bash(xargs grep -l \"from_phone\\\\|incoming.*message\\\\|POST.*whatsapp\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\Juanc\\Desktop\\TRABAJOS\\JP MARKET  PRO\\favicon_io",
