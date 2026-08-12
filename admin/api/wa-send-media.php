@@ -76,6 +76,26 @@ if ($action === 'send_media') {
     $tmpPath = $file['tmp_name'];
     $mimeType = mime_content_type($tmpPath);
 
+    // Para audio, asegurar compatibilidad con WhatsApp Cloud API
+    if ($mediaType === 'audio') {
+        // Meta acepta: audio/aac, audio/amr, audio/mpeg, audio/mp4, audio/ogg
+        $acceptedAudioMimes = ['audio/aac', 'audio/amr', 'audio/mpeg', 'audio/mp4', 'audio/ogg'];
+
+        // Si el MIME no es aceptado, intentar conversión/fallback
+        if (!in_array($mimeType, $acceptedAudioMimes)) {
+            @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO: MIME no soportado, intentando fallback: ' . $mimeType . "\n", FILE_APPEND);
+
+            // Si es WebM, intentar tratarlo como OGG (mismo contenido, diferente MIME)
+            if (strpos($mimeType, 'webm') !== false) {
+                $mimeType = 'audio/ogg';
+                @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO: WebM convertido a OGG en MIME' . "\n", FILE_APPEND);
+            } else {
+                // Fallback a OGG para cualquier audio desconocido
+                $mimeType = 'audio/ogg';
+            }
+        }
+    }
+
     // PASO 1: Upload file to Meta
     $ch = curl_init("https://graph.facebook.com/v18.0/{$phoneId}/media");
 

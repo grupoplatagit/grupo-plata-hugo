@@ -1147,53 +1147,59 @@ async function toggleRecorder() {
 
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
-        recordingChunks = [];
 
-        // DEBUG: Log actual MediaRecorder MIME type
-        console.log('🎙️ MediaRecorder.mimeType:', mediaRecorder.mimeType);
-        console.log('🎙️ Available MIME types:');
-        const mimeTypes = ['audio/ogg;codecs=opus', 'audio/ogg', 'audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'];
-        mimeTypes.forEach(mime => {
-            console.log(`  ${mime}:`, MediaRecorder.isTypeSupported(mime) ? '✓ SUPPORTED' : '✗ not supported');
-        });
+        // Detectar mejor MIME type compatible con WhatsApp Cloud API
+        const supportedMimes = [
+            'audio/ogg;codecs=opus',
+            'audio/ogg',
+            'audio/webm;codecs=opus',
+            'audio/webm',
+        ];
+
+        let selectedMime = 'audio/ogg'; // fallback
+        for (const mime of supportedMimes) {
+            if (MediaRecorder.isTypeSupported(mime)) {
+                selectedMime = mime;
+                console.log('🎙️ Usando MIME type:', selectedMime);
+                break;
+            }
+        }
+
+        // Crear MediaRecorder con MIME type específico
+        mediaRecorder = new MediaRecorder(stream, { mimeType: selectedMime });
+        recordingChunks = [];
 
         mediaRecorder.ondataavailable = (e) => {
             if (e.data.size > 0) recordingChunks.push(e.data);
         };
 
         mediaRecorder.onstop = () => {
-            // Use actual MIME type from MediaRecorder, fallback to audio/ogg
-            const actualMimeType = mediaRecorder.mimeType || 'audio/ogg';
-            const blob = new Blob(recordingChunks, { type: actualMimeType });
+            // Usar el MIME type que especificamos
+            const mimeType = selectedMime;
+            const blob = new Blob(recordingChunks, { type: mimeType });
 
-            // Determine extension based on actual MIME type
+            // Extensión correcta según MIME type
             let extension = 'ogg';
-            if (actualMimeType.includes('webm')) extension = 'webm';
-            else if (actualMimeType.includes('mp4')) extension = 'mp4';
+            if (mimeType.includes('webm')) extension = 'webm';
 
             const filename = `nota-voz-${Date.now()}.${extension}`;
-            const file = new File([blob], filename, { type: actualMimeType });
+            const file = new File([blob], filename, { type: mimeType });
 
-            // DEBUG: Log file creation
-            console.log('📁 Grabación guardada:');
-            console.log('  filename:', filename);
-            console.log('  blob.type:', blob.type);
-            console.log('  file.type:', file.type);
-            console.log('  file.size:', file.size);
-            console.log('  actualMimeType:', actualMimeType);
+            console.log('✅ Grabación lista:', {
+                filename,
+                mimeType,
+                size: file.size,
+            });
 
             selectedMedia = {
                 file: file,
                 name: file.name,
                 size: file.size,
-                type: actualMimeType,
+                type: mimeType,
                 mediaType: 'audio',
             };
 
             showRecordingPreview(file);
-
-            // Detener stream
             stream.getTracks().forEach(track => track.stop());
         };
 
