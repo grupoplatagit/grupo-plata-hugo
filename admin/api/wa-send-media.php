@@ -21,6 +21,15 @@ header('Content-Type: application/json');
 $db = getDB();
 $action = $_GET['action'] ?? '';
 
+// DEBUG
+$debug = [
+    'action' => $action,
+    'has_files' => isset($_FILES),
+    'files_keys' => array_keys($_FILES ?? []),
+    'post_keys' => array_keys($_POST ?? []),
+];
+@file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' DEBUG: ' . json_encode($debug) . "\n", FILE_APPEND);
+
 // ── Send image, audio, video, or document ──────────────────────────────────
 if ($action === 'send_media') {
     $leadId = isset($_POST['lead_id']) && $_POST['lead_id'] ? (int)$_POST['lead_id'] : null;
@@ -28,7 +37,8 @@ if ($action === 'send_media') {
     $mediaType = $_POST['media_type'] ?? ''; // image, audio, video, document
     $caption = trim($_POST['caption'] ?? '');
 
-    if (!$_FILES || !isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+    if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+        @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' ERROR: No file or error - ' . json_encode(['files' => $_FILES ?? 'empty', 'error' => $_FILES['file']['error'] ?? 'N/A']) . "\n", FILE_APPEND);
         echo json_encode(['ok' => false, 'msg' => 'Archivo requerido']);
         exit;
     }
