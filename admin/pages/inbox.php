@@ -361,8 +361,8 @@ include __DIR__ . '/../../views/admin/header.php';
     </div>
 </div>
 
-<!-- Opus Media Recorder para grabar OGG/Opus nativamente -->
-<script src="https://cdn.jsdelivr.net/npm/opus-media-recorder@latest/dist/opus-media-recorder.min.js"></script>
+<!-- RecordRTC para grabar OGG/Opus nativamente -->
+<script src="https://cdn.jsdelivr.net/npm/recordrtc@latest/RecordRTC.min.js"></script>
 
 <script>
 const API      = '<?= ADMIN_URL ?>/api/wa-messages.php';
@@ -1151,49 +1151,44 @@ async function toggleRecorder() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-        // OpusMediaRecorder graba DIRECTAMENTE en OGG/Opus
+        // RecordRTC graba DIRECTAMENTE en OGG/Opus
         // Sin necesidad de conversión artificial
-        console.log('🎙️ Usando OpusMediaRecorder para grabar OGG/Opus nativamente');
+        console.log('🎙️ Usando RecordRTC para grabar OGG/Opus nativamente');
 
-        mediaRecorder = new OpusMediaRecorder(stream, {
+        mediaRecorder = RecordRTC(stream, {
+            type: 'audio',
             mimeType: 'audio/ogg',
-            numChannels: 1,
-            sampleRate: 48000,
-            encoderSampleRate: 24000,
-            encoderFrameSize: 20,
+            numberOfAudioChannels: 1,
+            bufferSize: 4096,
+            audioBitsPerSecond: 128000,
         });
 
-        recordingChunks = [];
-
-        mediaRecorder.ondataavailable = (e) => {
-            if (e.data.size > 0) recordingChunks.push(e.data);
-        };
-
         mediaRecorder.onstop = () => {
-            // OpusMediaRecorder genera OGG REAL, no WebM disfrazado
-            const blob = new Blob(recordingChunks, { type: 'audio/ogg' });
-            const filename = `nota-voz-${Date.now()}.ogg`;
-            const file = new File([blob], filename, { type: 'audio/ogg' });
+            // RecordRTC genera OGG REAL, no WebM disfrazado
+            mediaRecorder.getBlob(blob => {
+                const filename = `nota-voz-${Date.now()}.ogg`;
+                const file = new File([blob], filename, { type: 'audio/ogg' });
 
-            console.log('✅ AUDIO RECORDING EXITOSO');
-            console.log('  filename:', filename);
-            console.log('  mime type:', 'audio/ogg (OGG/Opus real)');
-            console.log('  size:', file.size, 'bytes');
-            console.log('  ready to send to WhatsApp Cloud API');
+                console.log('✅ AUDIO RECORDING EXITOSO');
+                console.log('  filename:', filename);
+                console.log('  mime type:', 'audio/ogg (OGG/Opus real)');
+                console.log('  size:', file.size, 'bytes');
+                console.log('  ready to send to WhatsApp Cloud API');
 
-            selectedMedia = {
-                file: file,
-                name: file.name,
-                size: file.size,
-                type: 'audio/ogg',
-                mediaType: 'audio',
-            };
+                selectedMedia = {
+                    file: file,
+                    name: file.name,
+                    size: file.size,
+                    type: 'audio/ogg',
+                    mediaType: 'audio',
+                };
 
-            showRecordingPreview(file);
-            stream.getTracks().forEach(track => track.stop());
+                showRecordingPreview(file);
+                stream.getTracks().forEach(track => track.stop());
+            });
         };
 
-        mediaRecorder.start();
+        mediaRecorder.startRecording();
         recordingStartTime = Date.now();
         document.getElementById('recorderControls').classList.add('active');
 
