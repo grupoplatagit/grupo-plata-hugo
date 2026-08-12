@@ -53,14 +53,21 @@ if ($action === 'notes') {
 
 // ── Convert to lead ───────────────────────────────────────────────────────────
 if ($action === 'to_lead') {
-    $phone      = trim($input['phone']      ?? '');
-    $nombre     = trim($input['nombre']     ?? '');
-    $email      = trim($input['email']      ?? '');
-    $nicho      = trim($input['nicho']      ?? '');
-    $ciudad     = trim($input['ciudad']     ?? '');
-    $pais       = trim($input['pais']       ?? '');
-    $presupuesto = trim($input['presupuesto'] ?? '');
-    $objetivo   = trim($input['objetivo']   ?? '');
+    $phone                = trim($input['phone']                ?? '');
+    $nombre               = trim($input['nombre']               ?? '');
+    $email                = trim($input['email']                ?? '');
+    $dni                  = trim($input['dni']                  ?? '');
+    $ciudad               = trim($input['ciudad']               ?? '');
+    $provincia            = trim($input['provincia']            ?? '');
+    $tipo_credito         = trim($input['tipo_credito']         ?? '');
+    $monto_solicitado     = trim($input['monto_solicitado']     ?? '');
+    $destino_credito      = trim($input['destino_credito']      ?? '');
+    $ingresos_mensuales   = trim($input['ingresos_mensuales']   ?? '');
+    $situacion_laboral    = trim($input['situacion_laboral']    ?? '');
+    $antiguedad_laboral   = trim($input['antiguedad_laboral']   ?? '');
+    $cuotas_deseadas      = trim($input['cuotas_deseadas']      ?? '');
+    $asesor_asignado      = trim($input['asesor_asignado']      ?? '');
+    $prioridad            = trim($input['prioridad']            ?? 'media');
 
     if (!$nombre || !$phone) {
         echo json_encode(['ok'=>false,'msg'=>'Nombre y teléfono requeridos']);
@@ -77,9 +84,25 @@ if ($action === 'to_lead') {
         exit;
     }
 
-    $stmt = $db->prepare("INSERT INTO leads (nombre,email,whatsapp,nicho,ciudad,pais,presupuesto,objetivo,leido,wa_status)
-                          VALUES (?,?,?,?,?,?,?,?,1,'sent')");
-    $stmt->execute([$nombre, $email ?: $phone.'@wa.contact', $phone, $nicho, $ciudad, $pais, $presupuesto, $objetivo]);
+    $stmt = $db->prepare("INSERT INTO leads (nombre,email,whatsapp,dni,ciudad,provincia,tipo_credito,monto_solicitado,destino_credito,ingresos_mensuales,situacion_laboral,antiguedad_laboral,cuotas_deseadas,asesor_asignado,prioridad,leido,wa_status)
+                          VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,'sent')");
+    $stmt->execute([
+        $nombre,
+        $email ?: $phone.'@wa.contact',
+        $phone,
+        $dni,
+        $ciudad,
+        $provincia,
+        $tipo_credito,
+        $monto_solicitado,
+        $destino_credito,
+        $ingresos_mensuales,
+        $situacion_laboral,
+        $antiguedad_laboral,
+        $cuotas_deseadas,
+        $asesor_asignado,
+        $prioridad
+    ]);
     $leadId = $db->lastInsertId();
 
     // Link contact
@@ -91,7 +114,7 @@ if ($action === 'to_lead') {
     $db->prepare("UPDATE wa_messages SET lead_id=? WHERE lead_id IS NULL AND from_phone=?")
        ->execute([$leadId, $phone]);
 
-    echo json_encode(['ok'=>true,'lead_id'=>$leadId,'msg'=>'Lead creado correctamente']);
+    echo json_encode(['ok'=>true,'lead_id'=>$leadId,'msg'=>'Solicitud de crédito creada correctamente']);
     exit;
 }
 

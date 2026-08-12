@@ -309,48 +309,106 @@ include __DIR__ . '/../../views/admin/header.php';
 <div class="modal-overlay" id="leadModal" style="display:none" onclick="if(event.target===this)closeLeadModal()">
     <div class="modal-box wide">
         <div class="modal-header">
-            <h3>&#127919; Agregar como lead calificado</h3>
+            <h3>💳 Nueva Solicitud de Crédito</h3>
             <button class="modal-close" onclick="closeLeadModal()">&#10005;</button>
         </div>
         <div class="modal-body">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <!-- DATOS DEL CLIENTE -->
+                <div class="form-group" style="grid-column:1/-1;font-size:.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Datos del Cliente</div>
                 <div class="form-group">
-                    <label>Nombre *</label>
+                    <label>Nombre y Apellido *</label>
                     <input type="text" id="lf_nombre" placeholder="Juan García">
+                </div>
+                <div class="form-group">
+                    <label>DNI</label>
+                    <input type="text" id="lf_dni" placeholder="12.345.678">
                 </div>
                 <div class="form-group">
                     <label>Email</label>
                     <input type="email" id="lf_email" placeholder="juan@gmail.com">
                 </div>
                 <div class="form-group">
-                    <label>WhatsApp</label>
+                    <label>WhatsApp *</label>
                     <input type="text" id="lf_phone" readonly style="opacity:.6">
-                </div>
-                <div class="form-group">
-                    <label>Nicho / Industria</label>
-                    <input type="text" id="lf_nicho" placeholder="E-commerce, Salud...">
                 </div>
                 <div class="form-group">
                     <label>Ciudad</label>
                     <input type="text" id="lf_ciudad" placeholder="Buenos Aires">
                 </div>
                 <div class="form-group">
-                    <label>País</label>
-                    <input type="text" id="lf_pais" placeholder="Argentina">
+                    <label>Provincia</label>
+                    <input type="text" id="lf_provincia" placeholder="Buenos Aires">
                 </div>
+
+                <!-- DATOS DEL CRÉDITO -->
+                <div class="form-group" style="grid-column:1/-1;font-size:.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:8px">Datos del Crédito</div>
                 <div class="form-group">
-                    <label>Presupuesto</label>
-                    <select id="lf_presupuesto">
-                        <option value="">Sin especificar</option>
-                        <option value="$500 - $1,000 USD">$500 – $1K USD</option>
-                        <option value="$1,000 - $3,000 USD">$1K – $3K USD</option>
-                        <option value="$3,000 - $5,000 USD">$3K – $5K USD</option>
-                        <option value="$5,000+ USD">$5K+ USD</option>
+                    <label>Tipo de Crédito</label>
+                    <select id="lf_tipo_credito">
+                        <option value="">Seleccionar</option>
+                        <option value="Crédito personal">Crédito personal</option>
+                        <option value="Préstamo">Préstamo</option>
+                        <option value="Adelanto">Adelanto</option>
+                        <option value="Refinanciación">Refinanciación</option>
+                        <option value="Otro">Otro</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Objetivo</label>
-                    <input type="text" id="lf_objetivo" placeholder="Conseguir más clientes">
+                    <label>Monto Solicitado</label>
+                    <input type="text" id="lf_monto_solicitado" placeholder="$50.000">
+                </div>
+                <div class="form-group">
+                    <label>Destino del Crédito</label>
+                    <select id="lf_destino_credito">
+                        <option value="">Seleccionar</option>
+                        <option value="Consumo personal">Consumo personal</option>
+                        <option value="Cancelar deudas">Cancelar deudas</option>
+                        <option value="Gastos médicos">Gastos médicos</option>
+                        <option value="Vivienda">Vivienda</option>
+                        <option value="Vehículo">Vehículo</option>
+                        <option value="Emprendimiento">Emprendimiento</option>
+                        <option value="Educación">Educación</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ingresos Mensuales</label>
+                    <input type="text" id="lf_ingresos_mensuales" placeholder="$50.000">
+                </div>
+                <div class="form-group">
+                    <label>Situación Laboral</label>
+                    <select id="lf_situacion_laboral">
+                        <option value="">Seleccionar</option>
+                        <option value="Empleado">Empleado</option>
+                        <option value="Independiente">Independiente</option>
+                        <option value="Monotributista">Monotributista</option>
+                        <option value="Desempleado">Desempleado</option>
+                        <option value="Jubilado">Jubilado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Antigüedad Laboral</label>
+                    <input type="text" id="lf_antiguedad_laboral" placeholder="2 años">
+                </div>
+                <div class="form-group">
+                    <label>Cuotas Deseadas</label>
+                    <input type="number" id="lf_cuotas_deseadas" placeholder="12" min="1" max="120">
+                </div>
+
+                <!-- GESTIÓN COMERCIAL -->
+                <div class="form-group" style="grid-column:1/-1;font-size:.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:8px">Gestión Comercial</div>
+                <div class="form-group">
+                    <label>Asesor Asignado</label>
+                    <input type="text" id="lf_asesor_asignado" placeholder="Nombre del asesor">
+                </div>
+                <div class="form-group">
+                    <label>Prioridad</label>
+                    <select id="lf_prioridad">
+                        <option value="media">Media</option>
+                        <option value="alta">Alta</option>
+                        <option value="baja">Baja</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -756,12 +814,14 @@ function renderInfoPanel(panel, lead, phone, contact) {
 
     ${lead ? `
     <div class="info-section">
-        <h4>Información del lead</h4>
-        <div class="info-row"><span class="info-label">Email</span><span class="info-value" style="font-size:.7rem">${esc(lead.email||'—')}</span></div>
-        <div class="info-row"><span class="info-label">País</span><span class="info-value">${esc(lead.pais||'—')}</span></div>
-        <div class="info-row"><span class="info-label">Nicho</span><span class="info-value">${esc(lead.nicho||'—')}</span></div>
-        <div class="info-row"><span class="info-label">Presupuesto</span><span class="info-value" style="color:#25d366;font-weight:800">${esc(lead.presupuesto||'—')}</span></div>
-        <div class="info-row"><span class="info-label">Objetivo</span><span class="info-value">${esc(lead.objetivo||'—')}</span></div>
+        <h4>Solicitud de Crédito</h4>
+        <div class="info-row"><span class="info-label">DNI</span><span class="info-value">${esc(lead.dni||'—')}</span></div>
+        <div class="info-row"><span class="info-label">Provincia</span><span class="info-value">${esc(lead.provincia||'—')}</span></div>
+        <div class="info-row"><span class="info-label">Tipo</span><span class="info-value">${esc(lead.tipo_credito||'—')}</span></div>
+        <div class="info-row"><span class="info-label">Monto</span><span class="info-value" style="color:#25d366;font-weight:800">${esc(lead.monto_solicitado||'—')}</span></div>
+        <div class="info-row"><span class="info-label">Destino</span><span class="info-value">${esc(lead.destino_credito||'—')}</span></div>
+        <div class="info-row"><span class="info-label">Asesor</span><span class="info-value">${esc(lead.asesor_asignado||'—')}</span></div>
+        <div class="info-row"><span class="info-label">Prioridad</span><span class="info-value" style="color:${lead.prioridad==='alta'?'#ef4444':lead.prioridad==='media'?'#f59e0b':'#6b6b6b'};font-weight:600">${esc(lead.prioridad||'media')}</span></div>
     </div>` : `
     <div class="info-section">
         <button class="btn-convert" onclick="openLeadModal('${esc(phone)}', '${esc(contact.wa_name||'')}')">&#127919; Convertir a lead</button>
@@ -813,10 +873,18 @@ function openLeadModal(phone, waName='') {
     document.getElementById('lf_phone').value = phone;
     document.getElementById('lf_nombre').value = waName;
     document.getElementById('lf_email').value = '';
-    document.getElementById('lf_nicho').value = '';
+    document.getElementById('lf_dni').value = '';
     document.getElementById('lf_ciudad').value = '';
-    document.getElementById('lf_pais').value = '';
-    document.getElementById('lf_objetivo').value = '';
+    document.getElementById('lf_provincia').value = '';
+    document.getElementById('lf_tipo_credito').value = '';
+    document.getElementById('lf_monto_solicitado').value = '';
+    document.getElementById('lf_destino_credito').value = '';
+    document.getElementById('lf_ingresos_mensuales').value = '';
+    document.getElementById('lf_situacion_laboral').value = '';
+    document.getElementById('lf_antiguedad_laboral').value = '';
+    document.getElementById('lf_cuotas_deseadas').value = '';
+    document.getElementById('lf_asesor_asignado').value = '';
+    document.getElementById('lf_prioridad').value = 'media';
     document.getElementById('leadModal').style.display = 'flex';
     document.getElementById('lf_nombre').focus();
 }
@@ -825,14 +893,21 @@ function submitLead() {
     const btn = document.getElementById('submitLeadBtn');
     const data = {
         action:'to_lead',
-        phone:    document.getElementById('lf_phone').value,
-        nombre:   document.getElementById('lf_nombre').value.trim(),
-        email:    document.getElementById('lf_email').value.trim(),
-        nicho:    document.getElementById('lf_nicho').value.trim(),
-        ciudad:   document.getElementById('lf_ciudad').value.trim(),
-        pais:     document.getElementById('lf_pais').value.trim(),
-        presupuesto: document.getElementById('lf_presupuesto').value,
-        objetivo: document.getElementById('lf_objetivo').value.trim(),
+        phone:     document.getElementById('lf_phone').value,
+        nombre:    document.getElementById('lf_nombre').value.trim(),
+        email:     document.getElementById('lf_email').value.trim(),
+        dni:       document.getElementById('lf_dni').value.trim(),
+        ciudad:    document.getElementById('lf_ciudad').value.trim(),
+        provincia: document.getElementById('lf_provincia').value.trim(),
+        tipo_credito:      document.getElementById('lf_tipo_credito').value.trim(),
+        monto_solicitado:  document.getElementById('lf_monto_solicitado').value.trim(),
+        destino_credito:   document.getElementById('lf_destino_credito').value.trim(),
+        ingresos_mensuales: document.getElementById('lf_ingresos_mensuales').value.trim(),
+        situacion_laboral:  document.getElementById('lf_situacion_laboral').value.trim(),
+        antiguedad_laboral: document.getElementById('lf_antiguedad_laboral').value.trim(),
+        cuotas_deseadas:    document.getElementById('lf_cuotas_deseadas').value.trim(),
+        asesor_asignado:    document.getElementById('lf_asesor_asignado').value.trim(),
+        prioridad:          document.getElementById('lf_prioridad').value.trim(),
     };
     if (!data.nombre) { alert('El nombre es obligatorio'); return; }
     btn.disabled=true; btn.textContent='Guardando...';
@@ -843,9 +918,9 @@ function submitLead() {
             closeLeadModal();
             activeLeadId = d.lead_id;
             loadConversations();
-            loadInfoPanel(d.lead_id, data.nombre, data.phone, data.nicho);
+            loadInfoPanel(d.lead_id, data.nombre, data.phone, data.tipo_credito);
         } else { alert('Error: '+d.msg); }
-    }).finally(()=>{ btn.disabled=false; btn.textContent='🎯 Guardar lead'; });
+    }).finally(()=>{ btn.disabled=false; btn.textContent='💳 Guardar solicitud'; });
 }
 
 // ── Toast (reemplaza alert/confirm) ───────────────────────────────────────────
