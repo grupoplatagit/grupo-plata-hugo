@@ -74,25 +74,26 @@ if ($action === 'send_media') {
     // File info
     $file = $_FILES['file'];
     $tmpPath = $file['tmp_name'];
-    $mimeType = mime_content_type($tmpPath);
+    $detectedMime = mime_content_type($tmpPath);
 
-    // Para audio, asegurar compatibilidad con WhatsApp Cloud API
+    // Usar MIME type basado en media_type del formulario (más confiable que mime_content_type)
+    $mimeType = $detectedMime;
+
     if ($mediaType === 'audio') {
         // Meta acepta: audio/aac, audio/amr, audio/mpeg, audio/mp4, audio/ogg
         $acceptedAudioMimes = ['audio/aac', 'audio/amr', 'audio/mpeg', 'audio/mp4', 'audio/ogg'];
 
-        // Si el MIME no es aceptado, intentar conversión/fallback
-        if (!in_array($mimeType, $acceptedAudioMimes)) {
-            @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO: MIME no soportado, intentando fallback: ' . $mimeType . "\n", FILE_APPEND);
+        // Si el MIME detectado no es audio pero el formulario dice que es audio, corregir
+        if (strpos($detectedMime, 'audio') === false && strpos($detectedMime, 'webm') !== false) {
+            // WebM detectado como video, pero el usuario dice que es audio
+            $mimeType = 'audio/webm';
+            @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO: Corregido tipo de WebM de video a audio' . "\n", FILE_APPEND);
+        }
 
-            // Si es WebM, intentar tratarlo como OGG (mismo contenido, diferente MIME)
-            if (strpos($mimeType, 'webm') !== false) {
-                $mimeType = 'audio/ogg';
-                @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO: WebM convertido a OGG en MIME' . "\n", FILE_APPEND);
-            } else {
-                // Fallback a OGG para cualquier audio desconocido
-                $mimeType = 'audio/ogg';
-            }
+        // Si todavía no es aceptado, convertir a OGG
+        if (!in_array($mimeType, $acceptedAudioMimes)) {
+            @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO: MIME ' . $mimeType . ' no en lista Meta, usando audio/ogg' . "\n", FILE_APPEND);
+            $mimeType = 'audio/ogg';
         }
     }
 
