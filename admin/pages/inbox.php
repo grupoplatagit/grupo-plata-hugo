@@ -1168,18 +1168,34 @@ async function toggleRecorder() {
             const webmBlob = new Blob(recordingChunks, { type: 'audio/webm' });
 
             try {
-                // Cargar FFmpeg
-                const FFmpeg = FFmpeg.FFmpeg;
-                const fetchFile = FFmpeg.fetchFile;
-                const ffmpeg = new FFmpeg.FFmpeg();
+                // Esperar a que FFmpeg esté disponible
+                let attempts = 0;
+                while (!window.FFmpeg && attempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
 
+                if (!window.FFmpeg) {
+                    throw new Error('FFmpeg no se cargó desde CDN');
+                }
+
+                const { FFmpeg, fetchFile } = window.FFmpeg;
+                const ffmpeg = new FFmpeg();
+
+                console.log('⏳ Cargando FFmpeg...');
                 if (!ffmpeg.isLoaded()) {
                     await ffmpeg.load();
                 }
+                console.log('✓ FFmpeg listo');
 
                 // Convertir WebM → OGG
+                console.log('⏳ Escribiendo archivo WebM...');
                 await ffmpeg.writeFile('input.webm', await fetchFile(webmBlob));
+
+                console.log('⏳ Ejecutando conversión...');
                 await ffmpeg.exec(['-i', 'input.webm', '-c:a', 'libopus', '-b:a', '128k', 'output.ogg']);
+
+                console.log('⏳ Leyendo archivo OGG...');
                 const data = await ffmpeg.readFile('output.ogg');
 
                 // Crear Blob OGG
