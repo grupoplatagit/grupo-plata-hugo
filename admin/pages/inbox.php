@@ -510,7 +510,7 @@ function renderConvs(convs) {
         const preview  = c.last_msg ? esc(c.last_msg).substring(0,55) + (c.last_msg.length>55?'…':'') : '<em>Sin mensajes</em>';
         return `
         <div class="conv-item ${isActive?'active':''}"
-             onclick="openChat(${c.lead_id||'null'},'${esc(c.nombre)}','${esc(c.phone||'')}','${esc(c.nicho||'')}')"
+             onclick="openChat(${c.lead_id||'null'},'${esc(c.nombre)}','${esc(c.phone||'')}','${esc(c.tipo_credito||'')}')"
              oncontextmenu="event.preventDefault();showCtxMenu(event,'${esc(c.phone||'')}',${c.lead_id||'null'},'${esc(c.nombre)}')">
             <div class="conv-avatar-wrap">
                 <div class="conv-avatar" style="background:${clr}">${initial}</div>
@@ -530,7 +530,7 @@ function renderConvs(convs) {
 }
 
 // ── Open chat ─────────────────────────────────────────────────────────────────
-function openChat(leadId, nombre, phone, nicho) {
+function openChat(leadId, nombre, phone, tipo_credito) {
     activeLeadId = leadId||null;
     activePhone  = phone||null;
     lastMsgId    = 0;
@@ -575,7 +575,7 @@ function openChat(leadId, nombre, phone, nicho) {
     loadMessages(true);
     pollTimer = setInterval(() => loadMessages(false), 3000);
     loadConversations();
-    loadInfoPanel(leadId, nombre, phone, nicho);
+    loadInfoPanel(leadId, nombre, phone, tipo_credito);
 }
 
 // ── Messages ──────────────────────────────────────────────────────────────────
@@ -772,7 +772,7 @@ function sendMsg() {
 function insertQR(t) { const i=document.getElementById('chatInput'); if(i){i.value=t;i.focus();autoResize(i);} }
 
 // ── Info panel ────────────────────────────────────────────────────────────────
-function loadInfoPanel(leadId, nombre, phone, nicho, lead) {
+function loadInfoPanel(leadId, nombre, phone, tipo_credito, lead) {
     const panel = document.getElementById('infoPanel');
     panel.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:.8rem">Cargando...</div>';
 
@@ -1098,21 +1098,21 @@ function ncSearch(q) {
         return;
     }
     list.innerHTML = results.map(l => `
-        <div onclick="ncSelectLead(${l.id},'${esc(l.nombre)}','${esc(l.whatsapp)}','${esc(l.nicho||'')}')"
+        <div onclick="ncSelectLead(${l.id},'${esc(l.nombre)}','${esc(l.whatsapp)}','${esc(l.tipo_credito||'')}')"
             style="padding:10px 12px;border-radius:10px;border:1px solid var(--border);cursor:pointer;transition:all .15s;background:var(--bg);display:flex;align-items:center;gap:10px"
             onmouseover="this.style.borderColor='#25d366';this.style.background='rgba(37,211,102,.05)'"
             onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg)'">
             <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#1a5c2e,#25d366);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:.85rem;flex-shrink:0">${(l.nombre||'?').charAt(0).toUpperCase()}</div>
             <div style="flex:1;min-width:0">
                 <div style="font-size:.83rem;font-weight:700;color:var(--text)">${esc(l.nombre)}</div>
-                <div style="font-size:.72rem;color:var(--muted)">${esc(l.whatsapp)}${l.nicho?` · ${esc(l.nicho)}`:''}</div>
+                <div style="font-size:.72rem;color:var(--muted)">${esc(l.whatsapp)}${l.tipo_credito?` · ${esc(l.tipo_credito)}`:''}</div>
             </div>
             <span style="font-size:.7rem;color:#25d366">&#128172;</span>
         </div>`).join('');
 }
-function ncSelectLead(leadId, nombre, phone, nicho) {
+function ncSelectLead(leadId, nombre, phone, tipo_credito) {
     closeNewChat();
-    openChat(leadId, nombre, phone, nicho);
+    openChat(leadId, nombre, phone, tipo_credito);
 }
 function ncStartPhone() {
     const phone = document.getElementById('nc_phone_input').value.trim();
@@ -1498,7 +1498,7 @@ function sendMediaMessage() {
         fetch(`${API}?action=messages&lead_id=${openId}&since=0`)
             .then(r=>r.json())
             .then(d => {
-                if (d.lead) openChat(d.lead.id, d.lead.nombre, d.lead.whatsapp, d.lead.nicho||'');
+                if (d.lead) openChat(d.lead.id, d.lead.nombre, d.lead.whatsapp, d.lead.tipo_credito||'');
             });
     } else if (openPhone) {
         // Open directly by phone (prospect not yet a lead)
