@@ -121,6 +121,9 @@ function _migrateDB(PDO $pdo): void {
     if (!in_array('dni', $leadCols)) {
         $pdo->exec("ALTER TABLE leads ADD COLUMN dni TEXT");
         $pdo->exec("ALTER TABLE leads ADD COLUMN provincia TEXT");
+        $pdo->exec("ALTER TABLE leads ADD COLUMN tipo_credito TEXT");
+        $pdo->exec("ALTER TABLE leads ADD COLUMN monto_solicitado TEXT");
+        $pdo->exec("ALTER TABLE leads ADD COLUMN destino_credito TEXT");
         $pdo->exec("ALTER TABLE leads ADD COLUMN ingresos_mensuales TEXT");
         $pdo->exec("ALTER TABLE leads ADD COLUMN situacion_laboral TEXT");
         $pdo->exec("ALTER TABLE leads ADD COLUMN antiguedad_laboral TEXT");
