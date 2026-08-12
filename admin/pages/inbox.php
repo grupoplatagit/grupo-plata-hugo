@@ -1312,7 +1312,7 @@ function sendMediaMessage() {
     sendBtn.disabled = true;
     sendBtn.textContent = '⏳';
 
-    fetch(`${API}?action=send_media`, {
+    fetch(`${ADMIN}/api/wa-send-media.php?action=send_media`, {
         method: 'POST',
         body: formData,
     })
