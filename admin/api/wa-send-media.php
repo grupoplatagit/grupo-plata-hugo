@@ -19,7 +19,7 @@ requireLogin();
 header('Content-Type: application/json');
 
 $db = getDB();
-$action = $_POST['action'] ?? '';
+$action = $_GET['action'] ?? '';
 
 // ── Send image, audio, video, or document ──────────────────────────────────
 if ($action === 'send_media') {
