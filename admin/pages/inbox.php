@@ -876,6 +876,10 @@ function renderInfoPanel(panel, lead, phone, contact) {
         <div class="label-pills">${labelPills}</div>
     </div>
 
+    <div class="info-section">
+        <button class="btn-convert" style="background:rgba(37,211,102,.15);border:1px solid rgba(37,211,102,.3);color:#25d366;width:100%;text-align:center" onclick="saveContact('${esc(phone)}', '${esc(dispName)}')">📋 Agendar contacto</button>
+    </div>
+
     ${lead ? `
     <div class="info-section">
         <h4>Solicitud de Crédito</h4>
@@ -930,6 +934,32 @@ function setLabel(phone, label, btn) {
 function saveNotes(phone, notes) {
     fetch(CTX_API, { method:'POST', headers:{'Content-Type':'application/json'},
         body:JSON.stringify({action:'notes', phone, notes}) });
+}
+
+function saveContact(phone, nombre) {
+    if (!phone) { alert('Número requerido'); return; }
+    fetch(CTX_API, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+            action:'to_lead',
+            phone,
+            nombre: nombre || 'Contacto',
+            email: phone + '@wa.contact',
+            leido: 1
+        })
+    })
+    .then(r=>r.json())
+    .then(d => {
+        if (d.ok) {
+            alert('✅ Contacto agendado correctamente');
+            loadConversations();
+        } else if (d.msg && d.msg.includes('existe')) {
+            alert('✅ Este contacto ya estaba agendado');
+        } else {
+            alert('Error: ' + d.msg);
+        }
+    });
 }
 
 // ── Lead modal ────────────────────────────────────────────────────────────────
