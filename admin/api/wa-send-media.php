@@ -95,21 +95,51 @@ if ($action === 'send_media') {
     ]);
 
     $uploadResp = curl_exec($ch);
+    $curlError = curl_error($ch);
+    $curlErrno = curl_errno($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
+    // Log detailed error info
+    $debugInfo = [
+        'step' => 'upload_to_meta',
+        'filename' => $_FILES['file']['name'],
+        'mime_type' => $mimeType,
+        'file_size' => $_FILES['file']['size'],
+        'http_code' => $httpCode,
+        'curl_error' => $curlError ?: 'none',
+        'curl_errno' => $curlErrno,
+        'response_length' => strlen($uploadResp),
+    ];
+
     if ($httpCode !== 200) {
+        $debugInfo['response_body'] = substr($uploadResp, 0, 1000);
+        @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' UPLOAD FAILED: ' . json_encode($debugInfo) . "\n", FILE_APPEND);
         @unlink($tmpPath);
-        echo json_encode(['ok' => false, 'msg' => 'Error subiendo archivo a Meta']);
+        echo json_encode([
+            'ok' => false,
+            'msg' => 'Error subiendo archivo a Meta',
+            'debug' => [
+                'http_code' => $httpCode,
+                'error' => $curlError ?: json_decode($uploadResp, true)
+            ]
+        ]);
         exit;
     }
 
     $uploadData = json_decode($uploadResp, true);
     if (!isset($uploadData['id'])) {
+        @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' NO MEDIA_ID: ' . json_encode(['response' => $uploadData]) . "\n", FILE_APPEND);
         @unlink($tmpPath);
-        echo json_encode(['ok' => false, 'msg' => 'Meta no devolvió media_id']);
+        echo json_encode([
+            'ok' => false,
+            'msg' => 'Meta no devolvió media_id',
+            'debug' => $uploadData
+        ]);
         exit;
     }
+
+    @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' UPLOAD SUCCESS: ' . json_encode(['filename' => $_FILES['file']['name'], 'mime' => $mimeType, 'media_id' => $uploadData['id']]) . "\n", FILE_APPEND);
 
     $mediaId = $uploadData['id'];
 

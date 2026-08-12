@@ -1150,19 +1150,44 @@ async function toggleRecorder() {
         mediaRecorder = new MediaRecorder(stream);
         recordingChunks = [];
 
+        // DEBUG: Log actual MediaRecorder MIME type
+        console.log('🎙️ MediaRecorder.mimeType:', mediaRecorder.mimeType);
+        console.log('🎙️ Available MIME types:');
+        const mimeTypes = ['audio/ogg;codecs=opus', 'audio/ogg', 'audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'];
+        mimeTypes.forEach(mime => {
+            console.log(`  ${mime}:`, MediaRecorder.isTypeSupported(mime) ? '✓ SUPPORTED' : '✗ not supported');
+        });
+
         mediaRecorder.ondataavailable = (e) => {
             if (e.data.size > 0) recordingChunks.push(e.data);
         };
 
         mediaRecorder.onstop = () => {
-            const blob = new Blob(recordingChunks, { type: 'audio/ogg' });
-            const file = new File([blob], `nota-voz-${Date.now()}.ogg`, { type: 'audio/ogg' });
+            // Use actual MIME type from MediaRecorder, fallback to audio/ogg
+            const actualMimeType = mediaRecorder.mimeType || 'audio/ogg';
+            const blob = new Blob(recordingChunks, { type: actualMimeType });
+
+            // Determine extension based on actual MIME type
+            let extension = 'ogg';
+            if (actualMimeType.includes('webm')) extension = 'webm';
+            else if (actualMimeType.includes('mp4')) extension = 'mp4';
+
+            const filename = `nota-voz-${Date.now()}.${extension}`;
+            const file = new File([blob], filename, { type: actualMimeType });
+
+            // DEBUG: Log file creation
+            console.log('📁 Grabación guardada:');
+            console.log('  filename:', filename);
+            console.log('  blob.type:', blob.type);
+            console.log('  file.type:', file.type);
+            console.log('  file.size:', file.size);
+            console.log('  actualMimeType:', actualMimeType);
 
             selectedMedia = {
                 file: file,
                 name: file.name,
                 size: file.size,
-                type: 'audio/ogg',
+                type: actualMimeType,
                 mediaType: 'audio',
             };
 
@@ -1322,10 +1347,24 @@ function sendMediaMessage() {
             clearMediaPreview();
             loadMessages(false);
         } else {
-            alert('Error: ' + (d.msg || 'No se pudo enviar'));
+            // Show detailed error info for debugging
+            let errorMsg = d.msg || 'No se pudo enviar';
+            if (d.debug) {
+                console.error('📤 Error al enviar multimedia:', d.debug);
+                if (d.debug.http_code) {
+                    errorMsg += ` [HTTP ${d.debug.http_code}]`;
+                }
+                if (d.debug.error) {
+                    errorMsg += ` - ${JSON.stringify(d.debug.error).substring(0, 100)}`;
+                }
+            }
+            alert('Error: ' + errorMsg);
         }
     })
-    .catch(e => alert('Error: ' + e.message))
+    .catch(e => {
+        console.error('❌ Fetch error:', e);
+        alert('Error: ' + e.message);
+    })
     .finally(() => {
         sendBtn.disabled = false;
         sendBtn.textContent = '▶';
