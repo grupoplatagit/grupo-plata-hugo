@@ -145,6 +145,52 @@
         .badge { display: inline-block; padding: 3px 10px; border-radius: 50px; font-size: .72rem; font-weight: 600; }
         .badge-active   { background: rgba(34,197,94,.12); color: var(--success); }
         .badge-inactive { background: rgba(239,68,68,.12); color: var(--danger); }
+
+        /* Light theme */
+        @media (prefers-color-scheme: light) {
+            :root:not([data-theme="dark"]) {
+                --bg:       #ffffff;
+                --surface:  #f5f5f5;
+                --surface2: #efefef;
+                --accent:   #0891b2;
+                --accent-2: #06b6d4;
+                --accent-glow: rgba(6,182,212,0.15);
+                --text:     #1a1a1a;
+                --muted:    #666666;
+                --border:   #e5e5e5;
+            }
+        }
+        :root[data-theme="light"] {
+            --bg:       #ffffff;
+            --surface:  #f5f5f5;
+            --surface2: #efefef;
+            --accent:   #0891b2;
+            --accent-2: #06b6d4;
+            --accent-glow: rgba(6,182,212,0.15);
+            --text:     #1a1a1a;
+            --muted:    #666666;
+            --border:   #e5e5e5;
+        }
+        .topbar { background: rgba(255,255,255,0.9) !important; }
+        .sidebar-brand-logo { filter: none !important; }
+
+        /* Toggle button */
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text);
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .theme-toggle:hover {
+            background: var(--surface2);
+        }
     </style>
 </head>
 <body>
@@ -227,6 +273,7 @@
     <div class="topbar">
         <span class="topbar-title"><?= isset($pageTitle) ? htmlspecialchars($pageTitle) : 'Dashboard' ?></span>
         <div class="topbar-right">
+            <button class="theme-toggle" id="themeToggle" title="Cambiar tema">🌙</button>
             <span class="topbar-badge">&#128994; Online</span>
             <div class="topbar-user">
                 <span><?= htmlspecialchars(currentAdmin()) ?></span>
@@ -251,5 +298,37 @@
             <div id="areaDevError" style="color:#ef4444;font-size:0.85rem;margin-top:12px;display:none"></div>
         </div>
     </div>
+
+    <script>
+        // Theme toggle
+        function initTheme() {
+            const saved = localStorage.getItem('adminTheme') || 'dark';
+            const toggle = document.getElementById('themeToggle');
+            const html = document.documentElement;
+
+            html.setAttribute('data-theme', saved);
+            updateToggleIcon(saved);
+
+            toggle.addEventListener('click', () => {
+                const current = html.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', next);
+                localStorage.setItem('adminTheme', next);
+                updateToggleIcon(next);
+            });
+        }
+
+        function updateToggleIcon(theme) {
+            const toggle = document.getElementById('themeToggle');
+            toggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Initialize on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initTheme);
+        } else {
+            initTheme();
+        }
+    </script>
 
     <div class="page-content">
