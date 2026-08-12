@@ -80,20 +80,21 @@ if ($action === 'send_media') {
     $mimeType = $detectedMime;
 
     if ($mediaType === 'audio') {
-        // Meta acepta: audio/aac, audio/amr, audio/mpeg, audio/mp4, audio/ogg
-        $acceptedAudioMimes = ['audio/aac', 'audio/amr', 'audio/mpeg', 'audio/mp4', 'audio/ogg'];
+        // Meta acepta para recepción: audio/aac, audio/amr, audio/mpeg, audio/mp4, audio/ogg
+        // Para envío es más restrictivo, usar audio/aac que es mejor soportado
+        $acceptedAudioMimes = ['audio/aac', 'audio/amr', 'audio/mpeg', 'audio/mp4'];
 
         // Si el MIME detectado no es audio pero el formulario dice que es audio, corregir
         if (strpos($detectedMime, 'audio') === false && strpos($detectedMime, 'webm') !== false) {
             // WebM detectado como video, pero el usuario dice que es audio
-            $mimeType = 'audio/webm';
-            @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO: Corregido tipo de WebM de video a audio' . "\n", FILE_APPEND);
+            $mimeType = 'audio/aac';
+            @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO: Corregido tipo de WebM a audio/aac' . "\n", FILE_APPEND);
         }
 
-        // Si todavía no es aceptado, convertir a OGG
+        // Si todavía no es aceptado, convertir a AAC (más compatible con WhatsApp para envío)
         if (!in_array($mimeType, $acceptedAudioMimes)) {
-            @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO: MIME ' . $mimeType . ' no en lista Meta, usando audio/ogg' . "\n", FILE_APPEND);
-            $mimeType = 'audio/ogg';
+            @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO: MIME ' . $mimeType . ' no compatible, usando audio/aac' . "\n", FILE_APPEND);
+            $mimeType = 'audio/aac';
         }
     }
 
