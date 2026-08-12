@@ -80,22 +80,26 @@ if ($action === 'send_media') {
     $mimeType = $detectedMime;
 
     if ($mediaType === 'audio') {
-        // Meta acepta para recepción: audio/aac, audio/amr, audio/mpeg, audio/mp4, audio/ogg
-        // Para envío es más restrictivo, usar audio/aac que es mejor soportado
-        $acceptedAudioMimes = ['audio/aac', 'audio/amr', 'audio/mpeg', 'audio/mp4'];
+        // Meta acepta para envío: audio/aac, audio/amr, audio/mpeg, audio/mp4, audio/ogg
+        $acceptedAudioMimes = ['audio/aac', 'audio/amr', 'audio/mpeg', 'audio/mp4', 'audio/ogg'];
 
-        // Si el MIME detectado no es audio pero el formulario dice que es audio, corregir
-        if (strpos($detectedMime, 'audio') === false && strpos($detectedMime, 'webm') !== false) {
-            // WebM detectado como video, pero el usuario dice que es audio
-            $mimeType = 'audio/aac';
-            @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO: Corregido tipo de WebM a audio/aac' . "\n", FILE_APPEND);
-        }
-
-        // Si todavía no es aceptado, convertir a AAC (más compatible con WhatsApp para envío)
+        // El navegador debe haber grabado REALMENTE en un formato compatible
+        // NO hacer conversiones artificiales de formato
         if (!in_array($mimeType, $acceptedAudioMimes)) {
-            @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO: MIME ' . $mimeType . ' no compatible, usando audio/aac' . "\n", FILE_APPEND);
-            $mimeType = 'audio/aac';
+            @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO ERROR: MIME ' . $mimeType . ' no compatible. Requiere: ' . implode(', ', $acceptedAudioMimes) . "\n", FILE_APPEND);
+            @unlink($tmpPath);
+            echo json_encode([
+                'ok' => false,
+                'msg' => 'Formato de audio no compatible. El navegador no grabó en OGG/Opus.',
+                'debug' => [
+                    'received_mime' => $mimeType,
+                    'accepted_mimes' => $acceptedAudioMimes
+                ]
+            ]);
+            exit;
         }
+
+        @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO: MIME compatible: ' . $mimeType . "\n", FILE_APPEND);
     }
 
     // PASO 1: Upload file to Meta

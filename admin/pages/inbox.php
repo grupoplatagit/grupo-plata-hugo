@@ -1148,25 +1148,37 @@ async function toggleRecorder() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-        // Detectar mejor MIME type compatible con WhatsApp Cloud API
-        const supportedMimes = [
-            'audio/ogg;codecs=opus',
-            'audio/ogg',
-            'audio/webm;codecs=opus',
-            'audio/webm',
+        // Detectar MIME type REALMENTE compatible (NO WebM)
+        // Prioridad: OGG > otro formato soportado nativamente
+        const preferredMimes = [
+            'audio/ogg;codecs=opus',  // OGG con Opus - ideal para WhatsApp
+            'audio/ogg',               // OGG básico
         ];
 
-        let selectedMime = 'audio/ogg'; // fallback
-        for (const mime of supportedMimes) {
-            if (MediaRecorder.isTypeSupported(mime)) {
+        let selectedMime = null;
+        let mediaRecorderOptions = {};
+
+        console.log('🎙️ Detectando formatos de audio soportados...');
+        for (const mime of preferredMimes) {
+            const supported = MediaRecorder.isTypeSupported(mime);
+            console.log(`  ${mime}: ${supported ? '✓ SOPORTADO' : '✗ no soportado'}`);
+            if (supported) {
                 selectedMime = mime;
-                console.log('🎙️ Usando MIME type:', selectedMime);
+                mediaRecorderOptions = { mimeType: mime };
+                console.log('🎙️ ✓ Usando:', selectedMime);
                 break;
             }
         }
 
-        // Crear MediaRecorder con MIME type específico
-        mediaRecorder = new MediaRecorder(stream, { mimeType: selectedMime });
+        if (!selectedMime) {
+            console.error('❌ ERROR: El navegador no soporta OGG/Opus nativo');
+            alert('⚠️ Tu navegador no puede grabar notas de voz en formato compatible con WhatsApp.\n\nFormatos requeridos: audio/ogg o audio/ogg;codecs=opus\n\nIntenta con Chrome, Firefox o Edge versiones recientes.');
+            stream.getTracks().forEach(track => track.stop());
+            return;
+        }
+
+        // Crear MediaRecorder CON MIME TYPE ESPECÍFICO
+        mediaRecorder = new MediaRecorder(stream, mediaRecorderOptions);
         recordingChunks = [];
 
         mediaRecorder.ondataavailable = (e) => {
@@ -1174,28 +1186,31 @@ async function toggleRecorder() {
         };
 
         mediaRecorder.onstop = () => {
-            // Usar el MIME type que especificamos
-            const mimeType = selectedMime;
-            const blob = new Blob(recordingChunks, { type: mimeType });
+            // El Blob debe usar EXACTAMENTE el mime type del recorder
+            const actualMimeType = mediaRecorder.mimeType;
+            const blob = new Blob(recordingChunks, { type: actualMimeType });
 
-            // Extensión correcta según MIME type
-            let extension = 'ogg';
-            if (mimeType.includes('webm')) extension = 'webm';
+            // Determinar extensión (siempre .ogg para OGG)
+            const extension = actualMimeType.includes('ogg') ? 'ogg' : 'ogg';
 
             const filename = `nota-voz-${Date.now()}.${extension}`;
-            const file = new File([blob], filename, { type: mimeType });
+            const file = new File([blob], filename, { type: actualMimeType });
 
-            console.log('✅ Grabación lista:', {
-                filename,
-                mimeType,
-                size: file.size,
-            });
+            // DEBUG: Confirmar que todo coincide
+            console.log('📁 AUDIO RECORDING DEBUG');
+            console.log('  mimeType seleccionado:', selectedMime);
+            console.log('  mediaRecorder.mimeType:', mediaRecorder.mimeType);
+            console.log('  blob.type:', blob.type);
+            console.log('  file.type:', file.type);
+            console.log('  filename:', filename);
+            console.log('  filesize:', file.size, 'bytes');
+            console.log('  ✓ Todos coinciden:', actualMimeType === mediaRecorder.mimeType && actualMimeType === blob.type);
 
             selectedMedia = {
                 file: file,
                 name: file.name,
                 size: file.size,
-                type: mimeType,
+                type: actualMimeType,
                 mediaType: 'audio',
             };
 
