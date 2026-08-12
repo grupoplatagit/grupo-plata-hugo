@@ -234,15 +234,6 @@
         <a href="<?= ADMIN_URL ?>/pages/leads.php" class="nav-item <?= strpos($_SERVER['PHP_SELF'],'leads')!==false ? 'active' : '' ?>">
             <span class="icon">&#127919;</span> Leads
         </a>
-        <a href="<?= ADMIN_URL ?>/pages/prospectos.php" class="nav-item <?= strpos($_SERVER['PHP_SELF'],'prospectos')!==false ? 'active' : '' ?>">
-            <span class="icon">&#128270;</span> Prospectos
-        </a>
-        <a href="<?= ADMIN_URL ?>/pages/pipeline.php" class="nav-item <?= strpos($_SERVER['PHP_SELF'],'pipeline')!==false ? 'active' : '' ?>">
-            <span class="icon">&#128202;</span> Pipeline
-        </a>
-        <a href="<?= ADMIN_URL ?>/pages/propuestas.php" class="nav-item <?= strpos($_SERVER['PHP_SELF'],'propuestas')!==false ? 'active' : '' ?>">
-            <span class="icon">&#128196;</span> Propuestas
-        </a>
         <a href="<?= ADMIN_URL ?>/pages/clientes.php" class="nav-item <?= strpos($_SERVER['PHP_SELF'],'clientes')!==false && strpos($_SERVER['PHP_SELF'],'nuevo')=== false ? 'active' : '' ?>">
             <span class="icon">&#128101;</span> Clientes
         </a>
