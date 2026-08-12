@@ -293,7 +293,7 @@
     <div class="topbar">
         <span class="topbar-title"><?= isset($pageTitle) ? htmlspecialchars($pageTitle) : 'Dashboard' ?></span>
         <div class="topbar-right">
-            <button id="themeToggle" title="Cambiar tema" style="background:#06b6d4;border:none;color:#000;cursor:pointer;padding:4px;border-radius:6px;font-size:1rem;width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;font-family:inherit;transition:all 0.2s;font-weight:bold;">🌙</button>
+            <button id="themeToggle" title="Cambiar tema" style="background:#06b6d4;border:2px solid #04a7bd;color:#000;cursor:pointer;padding:6px 8px;border-radius:4px;font-size:0.75rem;font-weight:bold;font-family:inherit;transition:all 0.2s;">TEMA</button>
             <span class="topbar-badge">&#128994; Online</span>
             <div class="topbar-user">
                 <span><?= htmlspecialchars(currentAdmin()) ?></span>
