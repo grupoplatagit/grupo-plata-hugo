@@ -361,6 +361,9 @@ include __DIR__ . '/../../views/admin/header.php';
     </div>
 </div>
 
+<!-- Opus Media Recorder para grabar OGG/Opus nativamente -->
+<script src="https://cdn.jsdelivr.net/npm/opus-media-recorder@latest/dist/opus-media-recorder.min.js"></script>
+
 <script>
 const API      = '<?= ADMIN_URL ?>/api/wa-messages.php';
 const TPL_API  = '<?= ADMIN_URL ?>/api/wa-templates.php';
@@ -1148,37 +1151,18 @@ async function toggleRecorder() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-        // Detectar MIME type REALMENTE compatible (NO WebM)
-        // Prioridad: OGG > otro formato soportado nativamente
-        const preferredMimes = [
-            'audio/ogg;codecs=opus',  // OGG con Opus - ideal para WhatsApp
-            'audio/ogg',               // OGG básico
-        ];
+        // OpusMediaRecorder graba DIRECTAMENTE en OGG/Opus
+        // Sin necesidad de conversión artificial
+        console.log('🎙️ Usando OpusMediaRecorder para grabar OGG/Opus nativamente');
 
-        let selectedMime = null;
-        let mediaRecorderOptions = {};
+        mediaRecorder = new OpusMediaRecorder(stream, {
+            mimeType: 'audio/ogg',
+            numChannels: 1,
+            sampleRate: 48000,
+            encoderSampleRate: 24000,
+            encoderFrameSize: 20,
+        });
 
-        console.log('🎙️ Detectando formatos de audio soportados...');
-        for (const mime of preferredMimes) {
-            const supported = MediaRecorder.isTypeSupported(mime);
-            console.log(`  ${mime}: ${supported ? '✓ SOPORTADO' : '✗ no soportado'}`);
-            if (supported) {
-                selectedMime = mime;
-                mediaRecorderOptions = { mimeType: mime };
-                console.log('🎙️ ✓ Usando:', selectedMime);
-                break;
-            }
-        }
-
-        if (!selectedMime) {
-            console.error('❌ ERROR: El navegador no soporta OGG/Opus nativo');
-            alert('⚠️ Tu navegador no puede grabar notas de voz en formato compatible con WhatsApp.\n\nFormatos requeridos: audio/ogg o audio/ogg;codecs=opus\n\nIntenta con Chrome, Firefox o Edge versiones recientes.');
-            stream.getTracks().forEach(track => track.stop());
-            return;
-        }
-
-        // Crear MediaRecorder CON MIME TYPE ESPECÍFICO
-        mediaRecorder = new MediaRecorder(stream, mediaRecorderOptions);
         recordingChunks = [];
 
         mediaRecorder.ondataavailable = (e) => {
@@ -1186,31 +1170,22 @@ async function toggleRecorder() {
         };
 
         mediaRecorder.onstop = () => {
-            // El Blob debe usar EXACTAMENTE el mime type del recorder
-            const actualMimeType = mediaRecorder.mimeType;
-            const blob = new Blob(recordingChunks, { type: actualMimeType });
+            // OpusMediaRecorder genera OGG REAL, no WebM disfrazado
+            const blob = new Blob(recordingChunks, { type: 'audio/ogg' });
+            const filename = `nota-voz-${Date.now()}.ogg`;
+            const file = new File([blob], filename, { type: 'audio/ogg' });
 
-            // Determinar extensión (siempre .ogg para OGG)
-            const extension = actualMimeType.includes('ogg') ? 'ogg' : 'ogg';
-
-            const filename = `nota-voz-${Date.now()}.${extension}`;
-            const file = new File([blob], filename, { type: actualMimeType });
-
-            // DEBUG: Confirmar que todo coincide
-            console.log('📁 AUDIO RECORDING DEBUG');
-            console.log('  mimeType seleccionado:', selectedMime);
-            console.log('  mediaRecorder.mimeType:', mediaRecorder.mimeType);
-            console.log('  blob.type:', blob.type);
-            console.log('  file.type:', file.type);
+            console.log('✅ AUDIO RECORDING EXITOSO');
             console.log('  filename:', filename);
-            console.log('  filesize:', file.size, 'bytes');
-            console.log('  ✓ Todos coinciden:', actualMimeType === mediaRecorder.mimeType && actualMimeType === blob.type);
+            console.log('  mime type:', 'audio/ogg (OGG/Opus real)');
+            console.log('  size:', file.size, 'bytes');
+            console.log('  ready to send to WhatsApp Cloud API');
 
             selectedMedia = {
                 file: file,
                 name: file.name,
                 size: file.size,
-                type: actualMimeType,
+                type: 'audio/ogg',
                 mediaType: 'audio',
             };
 
@@ -1230,7 +1205,7 @@ async function toggleRecorder() {
                 `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }, 100);
     } catch (error) {
-        alert('Error al acceder al micrófono: ' + error.message);
+        alert('Error: ' + error.message);
     }
 }
 

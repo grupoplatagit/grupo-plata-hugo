@@ -80,26 +80,20 @@ if ($action === 'send_media') {
     $mimeType = $detectedMime;
 
     if ($mediaType === 'audio') {
-        // Meta acepta para envío: audio/aac, audio/amr, audio/mpeg, audio/mp4, audio/ogg
-        $acceptedAudioMimes = ['audio/aac', 'audio/amr', 'audio/mpeg', 'audio/mp4', 'audio/ogg'];
-
-        // El navegador debe haber grabado REALMENTE en un formato compatible
-        // NO hacer conversiones artificiales de formato
-        if (!in_array($mimeType, $acceptedAudioMimes)) {
-            @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO ERROR: MIME ' . $mimeType . ' no compatible. Requiere: ' . implode(', ', $acceptedAudioMimes) . "\n", FILE_APPEND);
+        // OpusMediaRecorder graba DIRECTAMENTE en audio/ogg
+        // Solo aceptar OGG (sin conversiones artificiales)
+        if ($mimeType !== 'audio/ogg') {
+            @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO ERROR: Se requiere audio/ogg, recibido: ' . $mimeType . "\n", FILE_APPEND);
             @unlink($tmpPath);
             echo json_encode([
                 'ok' => false,
-                'msg' => 'Formato de audio no compatible. El navegador no grabó en OGG/Opus.',
-                'debug' => [
-                    'received_mime' => $mimeType,
-                    'accepted_mimes' => $acceptedAudioMimes
-                ]
+                'msg' => 'Audio debe ser OGG/Opus. Asegúrate que OpusMediaRecorder esté cargado.',
+                'debug' => ['received_mime' => $mimeType]
             ]);
             exit;
         }
 
-        @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO: MIME compatible: ' . $mimeType . "\n", FILE_APPEND);
+        @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' AUDIO: OGG/Opus detectado, procediendo con envío' . "\n", FILE_APPEND);
     }
 
     // PASO 1: Upload file to Meta
