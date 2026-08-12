@@ -445,6 +445,7 @@ let allConvs     = [];
 let activeFilter = 'todos';
 let prevConvCount = 0;
 let soundEnabled = true;
+let prevUnreadCount = 0;
 
 // Notification & sound functions
 function playNotificationSound() {
@@ -517,19 +518,24 @@ function loadConversations() {
         .then(r => r.json())
         .then(d => {
             const newConvs = d.data || [];
-            const currentCount = newConvs.length;
 
-            // Detectar nuevas conversaciones
-            if (prevConvCount > 0 && currentCount > prevConvCount) {
-                const newConv = newConvs[0];
-                playNotificationSound();
-                showNotification(
-                    '📱 Nuevo mensaje',
-                    (newConv.nombre || 'Nuevo contacto') + ': ' + (newConv.last_msg || '')
-                );
+            // Detectar cambios en mensajes sin leer
+            const currentUnread = newConvs.reduce((sum, c) => sum + parseInt(c.unread || 0), 0);
+
+            if (prevUnreadCount > 0 && currentUnread > prevUnreadCount) {
+                // Hay nuevos mensajes sin leer
+                const convWithUnread = newConvs.find(c => parseInt(c.unread || 0) > 0);
+                if (convWithUnread) {
+                    playNotificationSound();
+                    showNotification(
+                        '📱 Nuevo mensaje',
+                        (convWithUnread.nombre || 'Nuevo contacto') + ': ' + (convWithUnread.last_msg || '')
+                    );
+                }
             }
 
-            prevConvCount = currentCount;
+            prevConvCount = newConvs.length;
+            prevUnreadCount = currentUnread;
             allConvs = newConvs;
             applyFilter();
         });
