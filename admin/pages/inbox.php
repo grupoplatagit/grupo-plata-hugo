@@ -116,6 +116,18 @@ include __DIR__ . '/../../views/admin/header.php';
 .btn-send:hover { background:#22c55e;box-shadow:0 0 16px rgba(37,211,102,.45);transform:scale(1.05); }
 .btn-send:disabled { opacity:.35;cursor:not-allowed;transform:none; }
 
+/* ── Media Attachment ── */
+#mediaFileInput { display:none; }
+.media-preview { background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:8px;display:flex;align-items:center;gap:10px; }
+.media-preview img,.media-preview video { max-width:60px;max-height:60px;border-radius:6px;object-fit:cover; }
+.media-preview-info { flex:1;min-width:0; }
+.media-preview-name { font-size:.8rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.media-preview-size { font-size:.7rem;color:var(--muted);margin-top:2px; }
+.media-preview-remove { background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;padding:4px;transition:color .2s; }
+.media-preview-remove:hover { color:var(--text); }
+.media-caption { width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:.8rem;color:var(--text);font-family:var(--font);margin-bottom:8px;outline:none;transition:border-color .2s; }
+.media-caption:focus { border-color:rgba(37,211,102,.5); }
+
 /* ── Info panel ── */
 .info-panel { overflow-y:auto;background:var(--surface);display:flex;flex-direction:column;scrollbar-width:thin;scrollbar-color:var(--border) transparent; }
 .info-empty { padding:36px 16px;text-align:center;color:var(--muted);font-size:.8rem;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px; }
@@ -461,7 +473,11 @@ function openChat(leadId, nombre, phone, nicho) {
                 <button class="btn-tool" onclick="insertQR('Hola! 👋 Gracias por tu mensaje, te respondo enseguida.')">&#9889; Saludo</button>
                 <button class="btn-tool" onclick="insertQR('Perfecto, te paso más información ahora mismo.')">&#128228; Info</button>
                 <button class="btn-tool" onclick="insertQR('¿Podemos agendar una llamada de 15 min? 📞')">&#128222; Llamada</button>
+                <button class="btn-tool" onclick="document.getElementById('mediaFileInput').click()">📎 Adjuntar</button>
+                <input type="file" id="mediaFileInput" accept="image/*,audio/*,video/*,.pdf,.doc,.docx" onchange="handleMediaSelect(event)">
             </div>
+            <div id="mediaPreviewContainer"></div>
+            <input type="text" id="mediaCaption" class="media-caption" placeholder="Agregar descripción (opcional)" style="display:none;">
             <div class="chat-input-row">
                 <textarea class="chat-input" id="chatInput" rows="1"
                     placeholder="Escribí un mensaje... (Enter envía)"
@@ -640,6 +656,12 @@ function loadMessages(initial=false) {
 
 // ── Send ──────────────────────────────────────────────────────────────────────
 function sendMsg() {
+    // Si hay media seleccionado, enviar media en lugar de texto
+    if (selectedMedia) {
+        sendMediaMessage();
+        return;
+    }
+
     const input = document.getElementById('chatInput');
     const btn   = document.getElementById('sendBtn');
     if (btn?.disabled) return; // evitar doble envío por Enter rápido
@@ -1088,6 +1110,115 @@ function openMediaModal(mediaId, type, mimeType) {
 
     modal.innerHTML = content;
     document.body.appendChild(modal);
+}
+
+// ── Media Upload Functions ──
+let selectedMedia = null;
+
+function handleMediaSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    selectedMedia = {
+        file: file,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+    };
+
+    // Detectar tipo de media
+    let mediaType = 'image';
+    if (file.type.startsWith('audio/')) mediaType = 'audio';
+    else if (file.type.startsWith('video/')) mediaType = 'video';
+    else if (file.type === 'application/pdf' || file.type.includes('document')) mediaType = 'document';
+
+    selectedMedia.mediaType = mediaType;
+
+    showMediaPreview(file, mediaType);
+}
+
+function showMediaPreview(file, mediaType) {
+    const container = document.getElementById('mediaPreviewContainer');
+    const captionInput = document.getElementById('mediaCaption');
+
+    let preview = '';
+    const icons = { image: '🖼️', audio: '🎵', video: '🎬', document: '📄' };
+    const icon = icons[mediaType] || '📎';
+
+    if (file.type.startsWith('image/')) {
+        const url = URL.createObjectURL(file);
+        preview = `<img src="${url}" style="max-width:60px;max-height:60px;border-radius:6px;object-fit:cover;">`;
+    } else if (file.type.startsWith('video/')) {
+        const url = URL.createObjectURL(file);
+        preview = `<video style="max-width:60px;max-height:60px;border-radius:6px;object-fit:cover;"><source src="${url}"></video>`;
+    } else {
+        preview = `<div style="font-size:2rem">${icon}</div>`;
+    }
+
+    container.innerHTML = `
+        <div class="media-preview">
+            ${preview}
+            <div class="media-preview-info">
+                <div class="media-preview-name">${file.name}</div>
+                <div class="media-preview-size">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
+            </div>
+            <button class="media-preview-remove" onclick="clearMediaPreview()">✕</button>
+        </div>
+    `;
+
+    captionInput.style.display = 'block';
+    captionInput.value = '';
+}
+
+function clearMediaPreview() {
+    selectedMedia = null;
+    document.getElementById('mediaFileInput').value = '';
+    document.getElementById('mediaPreviewContainer').innerHTML = '';
+    document.getElementById('mediaCaption').style.display = 'none';
+    document.getElementById('mediaCaption').value = '';
+}
+
+function sendMediaMessage() {
+    if (!selectedMedia) {
+        alert('Selecciona un archivo primero');
+        return;
+    }
+
+    if (!activeLeadId && !activePhone) {
+        alert('Selecciona una conversación');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('action', 'send_media');
+    if (activeLeadId) formData.append('lead_id', activeLeadId);
+    if (activePhone) formData.append('phone', activePhone);
+    formData.append('media_type', selectedMedia.mediaType);
+    formData.append('file', selectedMedia.file);
+    formData.append('caption', document.getElementById('mediaCaption').value);
+
+    const sendBtn = document.getElementById('sendBtn');
+    sendBtn.disabled = true;
+    sendBtn.textContent = '⏳';
+
+    fetch(`${API}?action=send_media`, {
+        method: 'POST',
+        body: formData,
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.ok) {
+            clearMediaPreview();
+            loadMessages(false);
+        } else {
+            alert('Error: ' + (d.msg || 'No se pudo enviar'));
+        }
+    })
+    .catch(e => alert('Error: ' + e.message))
+    .finally(() => {
+        sendBtn.disabled = false;
+        sendBtn.textContent = '▶';
+    });
 }
 
 (function() {
