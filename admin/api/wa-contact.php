@@ -26,7 +26,7 @@ if ($action === 'get') {
 // ── Set label ─────────────────────────────────────────────────────────────────
 if ($action === 'label') {
     $phone = trim($input['phone'] ?? '');
-    $allowedLabels = ['nuevo','potencial','calificado','agendado','cerrado','descartado'];
+    $allowedLabels = ['nuevo','contactado','datos_solicitados','documentacion','en_analisis','preaprobado','aprobado','desembolsado','rechazado','descartado'];
     $raw   = trim($input['label'] ?? '');
     $label = in_array($raw, $allowedLabels) ? $raw : 'nuevo';
     if (!$phone) { echo json_encode(['ok'=>false,'msg'=>'phone requerido']); exit; }
@@ -83,8 +83,8 @@ if ($action === 'to_lead') {
     $leadId = $db->lastInsertId();
 
     // Link contact
-    $db->prepare("INSERT INTO wa_contacts (phone,lead_id,label,updated_at) VALUES (?,?,'calificado',datetime('now','localtime'))
-                  ON CONFLICT(phone) DO UPDATE SET lead_id=excluded.lead_id, label='calificado', updated_at=excluded.updated_at")
+    $db->prepare("INSERT INTO wa_contacts (phone,lead_id,label,updated_at) VALUES (?,?,'contactado',datetime('now','localtime'))
+                  ON CONFLICT(phone) DO UPDATE SET lead_id=excluded.lead_id, label='contactado', updated_at=excluded.updated_at")
        ->execute([$phone, $leadId]);
 
     // Re-link existing messages

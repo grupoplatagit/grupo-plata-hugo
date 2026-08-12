@@ -379,20 +379,28 @@ let activeFilter = 'todos';
 
 // Label config
 const LABELS = {
-    nuevo:      { text:'Nuevo',      cls:'lbl-nuevo' },
-    potencial:  { text:'Potencial',  cls:'lbl-potencial' },
-    calificado: { text:'Calificado', cls:'lbl-calificado' },
-    agendado:   { text:'Agendado',   cls:'lbl-agendado' },
-    cerrado:    { text:'Cerrado',    cls:'lbl-cerrado' },
-    descartado: { text:'Descartado', cls:'lbl-descartado' },
+    nuevo:              { text:'Nuevo',              cls:'lbl-nuevo' },
+    contactado:         { text:'Contactado',         cls:'lbl-contactado' },
+    datos_solicitados:  { text:'Datos Solicitados',  cls:'lbl-datos_solicitados' },
+    documentacion:      { text:'Documentación',      cls:'lbl-documentacion' },
+    en_analisis:        { text:'En Análisis',        cls:'lbl-en_analisis' },
+    preaprobado:        { text:'Preaprobado',        cls:'lbl-preaprobado' },
+    aprobado:           { text:'Aprobado',           cls:'lbl-aprobado' },
+    desembolsado:       { text:'Desembolsado',       cls:'lbl-desembolsado' },
+    rechazado:          { text:'Rechazado',          cls:'lbl-rechazado' },
+    descartado:         { text:'Descartado',         cls:'lbl-descartado' },
 };
 const AVATAR_COLORS = {
     nuevo:'linear-gradient(135deg,#374151,#6b7280)',
-    potencial:'linear-gradient(135deg,#78350f,#fbbf24)',
-    calificado:'linear-gradient(135deg,#1a5c2e,#25d366)',
-    agendado:'linear-gradient(135deg,#0c4a6e,#06b6d4)',
-    cerrado:'linear-gradient(135deg,#14532d,#22c55e)',
-    descartado:'linear-gradient(135deg,#7f1d1d,#ef4444)',
+    contactado:'linear-gradient(135deg,#0c4a6e,#0ea5e9)',
+    datos_solicitados:'linear-gradient(135deg,#1e3a8a,#3b82f6)',
+    documentacion:'linear-gradient(135deg,#6d28d9,#a78bfa)',
+    en_analisis:'linear-gradient(135deg,#78350f,#fbbf24)',
+    preaprobado:'linear-gradient(135deg,#065f46,#10b981)',
+    aprobado:'linear-gradient(135deg,#14532d,#22c55e)',
+    desembolsado:'linear-gradient(135deg,#1b4332,#31c955)',
+    rechazado:'linear-gradient(135deg,#7f1d1d,#ef4444)',
+    descartado:'linear-gradient(135deg,#78716b,#a8a29e)',
 };
 
 // ── Conversations ─────────────────────────────────────────────────────────────
@@ -1040,8 +1048,10 @@ function ncStartPhone() {
 
 // ── Context menu ─────────────────────────────────────────────────────────────
 const LABEL_DOTS = {
-    nuevo:'#6b7280', potencial:'#f59e0b', calificado:'#3b82f6',
-    agendado:'#8b5cf6', cerrado:'#10b981', descartado:'#ef4444'
+    nuevo:'#6b7280', contactado:'#0ea5e9', datos_solicitados:'#3b82f6',
+    documentacion:'#a78bfa', en_analisis:'#fbbf24', preaprobado:'#10b981',
+    aprobado:'#22c55e', desembolsado:'#31c955', rechazado:'#ef4444',
+    descartado:'#a8a29e'
 };
 function showCtxMenu(e, phone, leadId, nombre='') {
     closeCtxMenu();
