@@ -128,6 +128,16 @@ include __DIR__ . '/../../views/admin/header.php';
 .media-caption { width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:.8rem;color:var(--text);font-family:var(--font);margin-bottom:8px;outline:none;transition:border-color .2s; }
 .media-caption:focus { border-color:rgba(37,211,102,.5); }
 
+/* ── Audio Recorder ── */
+.recorder-controls { background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;display:none; }
+.recorder-controls.active { display:flex;align-items:center;gap:10px; }
+.recorder-timer { font-size:.85rem;color:var(--muted);min-width:50px;font-weight:600;font-family:monospace; }
+.recorder-btn { padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-size:.8rem;transition:all .2s;font-family:var(--font); }
+.recorder-btn:hover { background:rgba(37,211,102,.1);border-color:rgba(37,211,102,.3); }
+.recorder-btn.recording { background:#ef4444;color:#fff;border-color:#dc2626;animation:pulse 1s infinite; }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.7; } }
+.recorder-waveform { flex:1;height:30px;background:rgba(37,211,102,.05);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:var(--muted); }
+
 /* ── Info panel ── */
 .info-panel { overflow-y:auto;background:var(--surface);display:flex;flex-direction:column;scrollbar-width:thin;scrollbar-color:var(--border) transparent; }
 .info-empty { padding:36px 16px;text-align:center;color:var(--muted);font-size:.8rem;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px; }
@@ -474,7 +484,14 @@ function openChat(leadId, nombre, phone, nicho) {
                 <button class="btn-tool" onclick="insertQR('Perfecto, te paso más información ahora mismo.')">&#128228; Info</button>
                 <button class="btn-tool" onclick="insertQR('¿Podemos agendar una llamada de 15 min? 📞')">&#128222; Llamada</button>
                 <button class="btn-tool" onclick="document.getElementById('mediaFileInput').click()">📎 Adjuntar</button>
+                <button class="btn-tool" onclick="toggleRecorder()">🎤 Grabar</button>
                 <input type="file" id="mediaFileInput" accept="image/*,audio/*,video/*,.pdf,.doc,.docx" onchange="handleMediaSelect(event)">
+            </div>
+            <div class="recorder-controls" id="recorderControls">
+                <div class="recorder-timer" id="recorderTimer">00:00</div>
+                <div class="recorder-waveform" id="recorderWaveform">● En vivo</div>
+                <button class="recorder-btn recording" id="recordBtn" onclick="toggleRecord()">⏹ Detener</button>
+                <button class="recorder-btn" id="cancelBtn" onclick="cancelRecording()">✕ Cancelar</button>
             </div>
             <div id="mediaPreviewContainer"></div>
             <input type="text" id="mediaCaption" class="media-caption" placeholder="Agregar descripción (opcional)" style="display:none;">
@@ -1114,6 +1131,100 @@ function openMediaModal(mediaId, type, mimeType) {
 
 // ── Media Upload Functions ──
 let selectedMedia = null;
+
+// ── Audio Recorder ──
+let mediaRecorder = null;
+let recordingChunks = [];
+let recordingStartTime = 0;
+let recordingInterval = null;
+
+async function toggleRecorder() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        clearInterval(recordingInterval);
+        return;
+    }
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        recordingChunks = [];
+
+        mediaRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) recordingChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(recordingChunks, { type: 'audio/ogg' });
+            const file = new File([blob], `nota-voz-${Date.now()}.ogg`, { type: 'audio/ogg' });
+
+            selectedMedia = {
+                file: file,
+                name: file.name,
+                size: file.size,
+                type: 'audio/ogg',
+                mediaType: 'audio',
+            };
+
+            showRecordingPreview(file);
+
+            // Detener stream
+            stream.getTracks().forEach(track => track.stop());
+        };
+
+        mediaRecorder.start();
+        recordingStartTime = Date.now();
+        document.getElementById('recorderControls').classList.add('active');
+
+        recordingInterval = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+            const mins = Math.floor(elapsed / 60);
+            const secs = elapsed % 60;
+            document.getElementById('recorderTimer').textContent =
+                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }, 100);
+    } catch (error) {
+        alert('Error al acceder al micrófono: ' + error.message);
+    }
+}
+
+function toggleRecord() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        clearInterval(recordingInterval);
+        document.getElementById('recorderControls').classList.remove('active');
+    }
+}
+
+function cancelRecording() {
+    if (mediaRecorder) {
+        mediaRecorder.stop();
+        clearInterval(recordingInterval);
+    }
+    selectedMedia = null;
+    document.getElementById('recorderControls').classList.remove('active');
+    document.getElementById('mediaPreviewContainer').innerHTML = '';
+    document.getElementById('mediaCaption').style.display = 'none';
+}
+
+function showRecordingPreview(file) {
+    const container = document.getElementById('mediaPreviewContainer');
+    const captionInput = document.getElementById('mediaCaption');
+
+    container.innerHTML = `
+        <div class="media-preview">
+            <div style="font-size:2rem">🎵</div>
+            <div class="media-preview-info">
+                <div class="media-preview-name">${file.name}</div>
+                <div class="media-preview-size">${(file.size / 1024).toFixed(2)} KB</div>
+            </div>
+            <button class="media-preview-remove" onclick="clearMediaPreview()">✕</button>
+        </div>
+    `;
+
+    captionInput.style.display = 'block';
+    captionInput.value = '';
+}
 
 function handleMediaSelect(event) {
     const file = event.target.files[0];
