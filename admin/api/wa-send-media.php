@@ -193,21 +193,51 @@ if ($action === 'send_media') {
     ]);
 
     $sendResp = curl_exec($ch);
+    $sendError = curl_error($ch);
+    $sendErrno = curl_errno($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
     @unlink($tmpPath);
 
+    // Log mensaje enviado
+    @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' SEND MESSAGE: ' . json_encode([
+        'to' => $toPhone,
+        'type' => $mediaType,
+        'media_id' => $mediaId,
+        'http_code' => $httpCode,
+    ]) . "\n", FILE_APPEND);
+
     if ($httpCode !== 200) {
-        echo json_encode(['ok' => false, 'msg' => 'Error enviando mensaje a WhatsApp']);
+        $errorData = json_decode($sendResp, true);
+        @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' SEND FAILED: ' . json_encode([
+            'http_code' => $httpCode,
+            'curl_error' => $sendError,
+            'response' => $errorData ?: substr($sendResp, 0, 500),
+        ]) . "\n", FILE_APPEND);
+        echo json_encode([
+            'ok' => false,
+            'msg' => 'Error enviando mensaje a WhatsApp',
+            'debug' => [
+                'http_code' => $httpCode,
+                'error' => $errorData
+            ]
+        ]);
         exit;
     }
 
     $sendData = json_decode($sendResp, true);
     if (!isset($sendData['messages'][0]['id'])) {
-        echo json_encode(['ok' => false, 'msg' => 'Error al enviar']);
+        @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' NO MESSAGE ID: ' . json_encode(['response' => $sendData]) . "\n", FILE_APPEND);
+        echo json_encode([
+            'ok' => false,
+            'msg' => 'Error al enviar',
+            'debug' => $sendData
+        ]);
         exit;
     }
+
+    @file_put_contents(__DIR__ . '/../../logs/wa-send-media.log', date('Y-m-d H:i:s') . ' SEND SUCCESS: ' . json_encode(['message_id' => $sendData['messages'][0]['id']]) . "\n", FILE_APPEND);
 
     $waMsgId = $sendData['messages'][0]['id'];
 
