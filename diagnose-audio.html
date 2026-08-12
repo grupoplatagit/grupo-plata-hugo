@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DIAGNÓSTICO: Soporte de Audio en MediaRecorder</title>
+    <style>
+        body { font-family: monospace; background: #000; color: #0f0; padding: 20px; }
+        h1 { color: #0f0; }
+        table { border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #0f0; padding: 10px; text-align: left; }
+        th { background: #0f0; color: #000; }
+        .true { color: #0f0; font-weight: bold; }
+        .false { color: #f00; font-weight: bold; }
+        pre { background: #111; border: 1px solid #0f0; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+
+<h1>🔍 DIAGNÓSTICO: MediaRecorder.isTypeSupported()</h1>
+<hr>
+
+<h2>NAVEGADOR</h2>
+<pre id="userAgent"></pre>
+
+<h2>SOPORTE DE FORMATOS DE AUDIO</h2>
+<table>
+    <tr>
+        <th>Formato</th>
+        <th>Soportado</th>
+        <th>Resultado</th>
+    </tr>
+    <tbody id="results"></tbody>
+</table>
+
+<h2>CONCLUSIÓN</h2>
+<pre id="conclusion"></pre>
+
+<script>
+// User Agent
+document.getElementById('userAgent').textContent = navigator.userAgent;
+
+// Formatos a probar
+const formats = [
+    'audio/ogg;codecs=opus',
+    'audio/ogg',
+    'audio/webm;codecs=opus',
+    'audio/webm',
+    'audio/mp4',
+    'audio/aac',
+    'audio/wav',
+    'audio/mpeg',
+];
+
+// Probar cada formato
+const results = [];
+const resultsTable = document.getElementById('results');
+
+formats.forEach(format => {
+    const supported = MediaRecorder.isTypeSupported(format);
+    results.push({
+        format,
+        supported
+    });
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td><strong>${format}</strong></td>
+        <td class="${supported ? 'true' : 'false'}">${supported ? 'SÍ ✓' : 'NO ✗'}</td>
+        <td>${supported ? '✓ Puede usarse' : '✗ No soportado'}</td>
+    `;
+    resultsTable.appendChild(row);
+});
+
+// Conclusión
+const supportedFormats = results.filter(r => r.supported).map(r => r.format);
+const oggSupported = results.find(r => r.format.includes('ogg') && r.supported);
+const webmSupported = results.find(r => r.format.includes('webm') && r.supported);
+
+let conclusion = '📋 DIAGNÓSTICO:\n\n';
+
+if (supportedFormats.length === 0) {
+    conclusion += '❌ ERROR: Este navegador NO soporta ningún formato de audio en MediaRecorder.\n';
+} else {
+    conclusion += `✓ Formatos soportados: ${supportedFormats.join(', ')}\n\n`;
+
+    if (oggSupported) {
+        conclusion += `✓✓ IDEAL: ${oggSupported.format} está soportado.\n`;
+        conclusion += '   → Se puede grabar directamente en OGG.\n';
+    } else if (webmSupported) {
+        conclusion += `⚠️ PROBLEMA: OGG NO está soportado.\n`;
+        conclusion += `✓ WebM SÍ está soportado: ${webmSupported.format}\n`;
+        conclusion += '   → MediaRecorder solo puede grabar en WebM.\n';
+        conclusion += '   → Se requiere conversión/codificación real en el navegador.\n';
+    }
+}
+
+document.getElementById('conclusion').textContent = conclusion;
+
+// Log en console también
+console.log('=== DIAGNÓSTICO DE AUDIO ===');
+console.log('Navegador:', navigator.userAgent);
+console.log('Formatos soportados:');
+results.forEach(r => {
+    console.log(`  ${r.format}: ${r.supported ? '✓' : '✗'}`);
+});
+</script>
+
+</body>
+</html>
