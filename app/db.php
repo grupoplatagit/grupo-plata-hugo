@@ -91,6 +91,13 @@ function _migrateDB(PDO $pdo): void {
             date('Y-m-d H:i:s') . " Admin creado: admin@jpmarket.com / $initPassword\n", FILE_APPEND);
     }
 
+    // Agregar columnas WhatsApp por usuario
+    $adminCols = array_column($pdo->query("PRAGMA table_info(admins)")->fetchAll(), 'name');
+    if (!in_array('wa_token', $adminCols)) {
+        $pdo->exec("ALTER TABLE admins ADD COLUMN wa_token TEXT");
+        $pdo->exec("ALTER TABLE admins ADD COLUMN wa_phone_id TEXT");
+    }
+
     $cols = array_column($pdo->query("PRAGMA table_info(clientes)")->fetchAll(), 'name');
     if (!in_array('campana', $cols)) {
         $pdo->exec("ALTER TABLE clientes ADD COLUMN campana INTEGER DEFAULT 1");

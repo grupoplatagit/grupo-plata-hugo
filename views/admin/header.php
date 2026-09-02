@@ -257,6 +257,9 @@
         </a>
 
         <div class="sidebar-section">Cuenta</div>
+        <a href="<?= ADMIN_URL ?>/pages/mi-whatsapp.php" class="nav-item <?= strpos($_SERVER['PHP_SELF'],'mi-whatsapp')!==false ? 'active' : '' ?>">
+            <span class="icon">📱</span> Mi WhatsApp API
+        </a>
         <a href="<?= ADMIN_URL ?>/pages/cambiar-password.php" class="nav-item <?= strpos($_SERVER['PHP_SELF'],'cambiar-password')!==false ? 'active' : '' ?>">
             <span class="icon">&#128274;</span> Cambiar contraseña
         </a>
