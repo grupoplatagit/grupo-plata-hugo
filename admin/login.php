@@ -209,12 +209,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['forgot'])) {
                 });
             }
         </script>
-        <form method="POST" action="" style="text-align:center;margin-top:12px">
-            <input type="hidden" name="csrf_token" value="<?= csrfToken() ?>">
-            <button type="submit" name="forgot" value="1" style="background:none;border:none;color:var(--muted);font-size:.8rem;cursor:pointer;font-family:inherit;transition:color .2s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
-                ¿Olvidaste tu contraseña?
-            </button>
-        </form>
+        <a href="<?= ADMIN_URL ?>/forgot-password.php" style="display:block;text-align:center;margin-top:12px;color:var(--muted);font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
+            🔐 ¿Olvidaste tu contraseña?
+        </a>
         <a href="<?= BASE_URL ?>" class="back-link">&#8592; Volver al sitio</a>
     </div>
 </body>

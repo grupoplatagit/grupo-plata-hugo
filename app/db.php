@@ -98,6 +98,12 @@ function _migrateDB(PDO $pdo): void {
         $pdo->exec("ALTER TABLE admins ADD COLUMN wa_phone_id TEXT");
     }
 
+    // Agregar columnas para reset de contraseña
+    if (!in_array('reset_token', $adminCols)) {
+        $pdo->exec("ALTER TABLE admins ADD COLUMN reset_token TEXT");
+        $pdo->exec("ALTER TABLE admins ADD COLUMN reset_expires TEXT");
+    }
+
     $cols = array_column($pdo->query("PRAGMA table_info(clientes)")->fetchAll(), 'name');
     if (!in_array('campana', $cols)) {
         $pdo->exec("ALTER TABLE clientes ADD COLUMN campana INTEGER DEFAULT 1");

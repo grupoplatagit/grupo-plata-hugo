@@ -78,7 +78,9 @@
       "Bash(git commit -m 'feat: register service worker for background notifications *)",
       "Bash(git commit -m 'feat: auto-schedule contacts when bot gets name *)",
       "Bash(xargs grep -l \"wa_messages\\\\|INSERT.*wa_messages\")",
-      "Bash(xargs grep -l \"from_phone\\\\|incoming.*message\\\\|POST.*whatsapp\")"
+      "Bash(xargs grep -l \"from_phone\\\\|incoming.*message\\\\|POST.*whatsapp\")",
+      "Read(//c/Users/Juanc/.claude/projects/c--Users-Juanc-Desktop-TRABAJOS-jp-market-pro-modelo-/memory/**)",
+      "Bash(sqlite3 jp_market.db \"SELECT id, nombre, email FROM admins WHERE nombre LIKE '%daniel%' OR email LIKE '%daniel%';\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\Juanc\\Desktop\\TRABAJOS\\JP MARKET  PRO\\favicon_io",
