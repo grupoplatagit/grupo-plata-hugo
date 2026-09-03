@@ -290,6 +290,10 @@ function _migrateDB(PDO $pdo): void {
         if (!in_array('caption', $waMsgCols)) {
             $pdo->exec("ALTER TABLE wa_messages ADD COLUMN caption TEXT");
         }
+        // Agregar columna para asociar mensajes a usuario (admin)
+        if (!in_array('admin_id', $waMsgCols)) {
+            $pdo->exec("ALTER TABLE wa_messages ADD COLUMN admin_id INTEGER");
+        }
         if (!in_array('media_url', $waMsgCols)) {
             $pdo->exec("ALTER TABLE wa_messages ADD COLUMN media_url TEXT");
         }

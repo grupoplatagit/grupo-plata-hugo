@@ -21,35 +21,37 @@ if ($action === 'leads_with_phone') {
 
 // ── Get conversations list ────────────────────────────────────────────────────
 if ($action === 'conversations') {
-    $rows = $db->query("
+    $adminId = $_SESSION['admin_id'] ?? 0;
+    $sql = "
         SELECT
             l.id        AS lead_id,
             l.nombre    AS nombre,
             l.whatsapp  AS phone,
             l.nicho     AS nicho,
-            (SELECT body FROM wa_messages WHERE lead_id = l.id ORDER BY created_at DESC LIMIT 1) AS last_msg,
-            (SELECT created_at FROM wa_messages WHERE lead_id = l.id ORDER BY created_at DESC LIMIT 1) AS last_ts,
-            (SELECT COUNT(*) FROM wa_messages WHERE lead_id = l.id AND direction = 'in' AND leido = 0) AS unread,
+            (SELECT body FROM wa_messages WHERE lead_id = l.id AND (admin_id IS NULL OR admin_id = $adminId) ORDER BY created_at DESC LIMIT 1) AS last_msg,
+            (SELECT created_at FROM wa_messages WHERE lead_id = l.id AND (admin_id IS NULL OR admin_id = $adminId) ORDER BY created_at DESC LIMIT 1) AS last_ts,
+            (SELECT COUNT(*) FROM wa_messages WHERE lead_id = l.id AND direction = 'in' AND leido = 0 AND (admin_id IS NULL OR admin_id = $adminId)) AS unread,
             COALESCE((SELECT label FROM wa_contacts WHERE phone = l.whatsapp), 'nuevo') AS label,
             COALESCE((SELECT wa_name FROM wa_contacts WHERE phone = l.whatsapp), '') AS wa_name
         FROM leads l
-        WHERE EXISTS (SELECT 1 FROM wa_messages WHERE lead_id = l.id)
+        WHERE EXISTS (SELECT 1 FROM wa_messages WHERE lead_id = l.id AND (admin_id IS NULL OR admin_id = $adminId))
         UNION ALL
         SELECT
             NULL          AS lead_id,
             COALESCE((SELECT wa_name FROM wa_contacts WHERE phone = from_phone), from_phone) AS nombre,
             from_phone    AS phone,
             'Desconocido' AS nicho,
-            (SELECT body FROM wa_messages m2 WHERE m2.from_phone = m.from_phone AND m2.lead_id IS NULL ORDER BY m2.created_at DESC LIMIT 1) AS last_msg,
+            (SELECT body FROM wa_messages m2 WHERE m2.from_phone = m.from_phone AND m2.lead_id IS NULL AND (m2.admin_id IS NULL OR m2.admin_id = $adminId) ORDER BY m2.created_at DESC LIMIT 1) AS last_msg,
             MAX(created_at) AS last_ts,
             SUM(CASE WHEN direction='in' AND leido=0 THEN 1 ELSE 0 END) AS unread,
             COALESCE((SELECT label FROM wa_contacts WHERE phone = from_phone), 'nuevo') AS label,
             COALESCE((SELECT wa_name FROM wa_contacts WHERE phone = from_phone), '') AS wa_name
         FROM wa_messages m
-        WHERE lead_id IS NULL
+        WHERE lead_id IS NULL AND (admin_id IS NULL OR admin_id = $adminId)
         GROUP BY from_phone
         ORDER BY last_ts DESC
-    ")->fetchAll();
+    ";
+    $rows = $db->query($sql)->fetchAll();
     echo json_encode(['ok' => true, 'data' => $rows]);
     exit;
 }
