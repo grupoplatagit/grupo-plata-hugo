@@ -42,25 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['forgot'])) {
         $ip       = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
         $db       = getDB();
 
-        $stmt = $db->prepare("SELECT attempts, blocked_until FROM login_attempts WHERE ip = ?");
-        $stmt->execute([$ip]);
-        $row = $stmt->fetch();
-
-        if ($row && $row['blocked_until'] && strtotime($row['blocked_until']) > time()) {
-            $error = 'Demasiados intentos fallidos. Esperá 15 minutos.';
-        } elseif (empty($email) || empty($password)) {
+        if (empty($email) || empty($password)) {
             $error = 'Completá todos los campos.';
         } elseif (!login($email, $password)) {
-            $db->prepare("INSERT INTO login_attempts (ip, attempts) VALUES (?, 1)
-                          ON CONFLICT(ip) DO UPDATE SET
-                            attempts = attempts + 1,
-                            blocked_until = CASE WHEN attempts + 1 >= 5
-                                                 THEN datetime('now','localtime','+15 minutes')
-                                                 ELSE NULL END")
-               ->execute([$ip]);
             $error = 'Credenciales incorrectas.';
         } else {
-            $db->prepare("DELETE FROM login_attempts WHERE ip = ?")->execute([$ip]);
             redirect(ADMIN_URL . '/index.php');
         }
     }
