@@ -26,7 +26,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
             $stmt = $db->prepare("UPDATE admins SET reset_token = ?, reset_expires = ? WHERE id = ?");
             $stmt->execute([$token, $expires, $admin['id']]);
 
-            $message = '✅ Token generado. Copia este enlace:';
+            // Enviar email
+            $resetLink = BASE_URL . '/admin/reset-password-token.php?token=' . urlencode($token);
+            $to = 'juancolasurdo24@gmail.com';
+            $subject = 'Reset de Contraseña - Grupo Plata';
+            $body = "Se ha solicitado un reset de contraseña para: $email\n\n";
+            $body .= "Enlace de reset (válido por 1 hora):\n";
+            $body .= "$resetLink\n\n";
+            $body .= "Si no solicitaste esto, ignora este email.\n";
+            $headers = "From: no-reply@grupoplatasf.com\r\nContent-Type: text/plain; charset=UTF-8";
+
+            mail($to, $subject, $body, $headers);
+
+            $message = '✅ Email enviado a juancolasurdo24@gmail.com';
         }
     }
 }
@@ -164,27 +176,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
             <div class="message <?= strpos($message, '✅') !== false ? 'success' : 'error' ?>">
                 <?= htmlspecialchars($message) ?>
             </div>
-
-            <?php if ($token): ?>
-                <div class="token-box">
-                    <strong>🔑 Usa este enlace para cambiar tu contraseña:</strong><br><br>
-                    <a href="<?= BASE_URL ?>/admin/reset-password-token.php?token=<?= urlencode($token) ?>" class="reset-link">
-                        <?= BASE_URL ?>/admin/reset-password-token.php?token=<?= urlencode($token) ?>
-                    </a>
-                    <p style="margin-top: 10px; color: #666; font-size: 12px;">
-                        ⏱️ Este enlace vence en 1 hora
-                    </p>
-                </div>
-            <?php endif; ?>
         <?php endif; ?>
 
-        <?php if (!$token): ?>
+        <?php if (!$message): ?>
             <form method="POST">
                 <div class="form-group">
-                    <label for="email">📧 Email</label>
+                    <label for="email">📧 Email del usuario</label>
                     <input type="email" id="email" name="email" required placeholder="daniel@grupoplata.com">
                 </div>
-                <button type="submit">Generar Enlace de Reset</button>
+                <button type="submit">Enviar Link de Reset</button>
             </form>
         <?php else: ?>
             <form method="POST" style="margin-top: 30px;">
@@ -192,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
                     <label for="email">📧 Otro email</label>
                     <input type="email" id="email" name="email" placeholder="otro@email.com">
                 </div>
-                <button type="submit">Generar Otro Token</button>
+                <button type="submit">Enviar Otro Reset</button>
             </form>
         <?php endif; ?>
 
