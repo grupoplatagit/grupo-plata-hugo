@@ -7,7 +7,6 @@ requireLogin();
 
 $db = getDB();
 $message = '';
-$unassigned_count = 0;
 
 // Obtener admins con phone_number_id
 $admins = $db->query("
@@ -17,26 +16,45 @@ $admins = $db->query("
     ORDER BY id
 ")->fetchAll(\PDO::FETCH_ASSOC);
 
-// Contar mensajes sin asignar
-$unassigned_count = $db->query("SELECT COUNT(*) FROM wa_messages WHERE admin_id IS NULL")->fetchColumn();
+// Obtener estadísticas de mensajes sin asignar por phone_number_id
+$unassigned_msgs = $db->query("
+    SELECT 
+        COALESCE(from_phone, '') as from_phone,
+        COUNT(*) as count,
+        (SELECT nombre FROM admins WHERE wa_phone_id = COALESCE(from_phone, '')) as admin_name
+    FROM wa_messages
+    WHERE admin_id IS NULL
+    GROUP BY from_phone
+    ORDER BY count DESC
+")->fetchAll(\PDO::FETCH_ASSOC);
 
-// Procesar asignación
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_id']) && isset($_POST['confirm'])) {
-    $admin_id = (int)$_POST['admin_id'];
+$total_unassigned = 0;
+foreach ($unassigned_msgs as $msg) {
+    $total_unassigned += $msg['count'];
+}
 
-    // Validar que el admin existe
-    $stmt = $db->prepare("SELECT id, nombre FROM admins WHERE id = ? AND activo = 1");
-    $stmt->execute([$admin_id]);
-    $admin = $stmt->fetch();
+// Procesar auto-asignación
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auto_assign'])) {
+    $assigned_count = 0;
+    
+    foreach ($admins as $admin) {
+        if (!empty($admin['wa_phone_id'])) {
+            $stmt = $db->prepare("
+                UPDATE wa_messages 
+                SET admin_id = ? 
+                WHERE admin_id IS NULL AND from_phone = ?
+            ");
+            $stmt->execute([$admin['id'], $admin['wa_phone_id']]);
+            $assigned_count += $stmt->rowCount();
+        }
+    }
 
-    if ($admin) {
-        $update = $db->prepare("UPDATE wa_messages SET admin_id = ? WHERE admin_id IS NULL");
-        $update->execute([$admin_id]);
-
-        $message = "✅ Asignados " . $unassigned_count . " mensajes a " . $admin['nombre'];
-        $unassigned_count = 0;
+    if ($assigned_count > 0) {
+        $message = "✅ Auto-asignados $assigned_count mensajes correctamente";
+        $total_unassigned = 0;
+        $unassigned_msgs = [];
     } else {
-        $message = "❌ Admin no válido";
+        $message = "⚠️ No hay mensajes para asignar";
     }
 }
 
@@ -50,7 +68,7 @@ include __DIR__ . '/../../views/admin/header.php';
     border: 1px solid var(--border);
     border-radius: 14px;
     padding: 28px;
-    max-width: 600px;
+    max-width: 700px;
 }
 
 .stat-box {
@@ -74,30 +92,39 @@ include __DIR__ . '/../../views/admin/header.php';
     font-size: 0.9rem;
 }
 
-.admin-option {
+.msg-group {
     background: var(--bg);
-    border: 2px solid var(--border);
+    border: 1px solid var(--border);
     border-radius: 10px;
     padding: 16px;
     margin-bottom: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.admin-option:hover {
-    border-color: #25d366;
-    background: rgba(37, 211, 102, 0.05);
-}
-
-.admin-option input[type="radio"] {
-    margin-right: 12px;
-}
-
-.admin-option label {
-    cursor: pointer;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    margin: 0;
+}
+
+.msg-info {
+    flex: 1;
+}
+
+.msg-phone {
+    font-family: monospace;
+    font-weight: 700;
+    color: #25d366;
+    margin-bottom: 4px;
+}
+
+.msg-count {
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.msg-admin {
+    background: var(--surface);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    white-space: nowrap;
 }
 
 .btn-assign {
@@ -105,11 +132,12 @@ include __DIR__ . '/../../views/admin/header.php';
     background: #25d366;
     color: #000;
     border: none;
-    padding: 12px;
+    padding: 14px;
     border-radius: 8px;
     font-weight: 700;
     cursor: pointer;
     margin-top: 20px;
+    font-size: 1rem;
     transition: all 0.2s;
 }
 
@@ -136,53 +164,60 @@ include __DIR__ . '/../../views/admin/header.php';
     border: 1px solid rgba(34, 197, 94, 0.25);
 }
 
-.alert-error {
-    background: rgba(239, 68, 68, 0.1);
-    color: #f87171;
-    border: 1px solid rgba(239, 68, 68, 0.25);
+.alert-warning {
+    background: rgba(251, 146, 60, 0.1);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 146, 60, 0.25);
 }
 </style>
 
 <div class="assign-card">
     <h2 style="margin-bottom: 24px; font-size: 1.3rem; font-weight: 800">
-        📋 Asignar Mensajes Históricos
+        🤖 Auto-Asignar Mensajes
     </h2>
 
     <?php if ($message): ?>
-        <div class="alert <?= strpos($message, '✅') !== false ? 'alert-success' : 'alert-error' ?>">
+        <div class="alert <?= strpos($message, '✅') !== false ? 'alert-success' : 'alert-warning' ?>">
             <?= htmlspecialchars($message) ?>
         </div>
     <?php endif; ?>
 
-    <?php if ($unassigned_count > 0): ?>
+    <?php if ($total_unassigned > 0): ?>
         <div class="stat-box">
-            <div class="stat-number"><?= $unassigned_count ?></div>
+            <div class="stat-number"><?= $total_unassigned ?></div>
             <div class="stat-label">Mensajes sin asignar</div>
         </div>
 
-        <form method="POST">
-            <input type="hidden" name="confirm" value="1">
+        <p style="color: var(--muted); margin-bottom: 20px; font-size: 0.9rem;">
+            Se asignarán automáticamente según el phone_number_id configurado de cada admin:
+        </p>
 
-            <p style="color: var(--muted); margin-bottom: 16px; font-size: 0.9rem;">
-                Selecciona a quién pertenecen estos mensajes:
-            </p>
-
-            <div>
-                <?php foreach ($admins as $admin): ?>
-                    <div class="admin-option">
-                        <label>
-                            <input type="radio" name="admin_id" value="<?= $admin['id'] ?>" required>
-                            <strong><?= htmlspecialchars($admin['nombre']) ?></strong>
-                            <span style="color: var(--muted); font-size: 0.85rem;">
-                                (<?= htmlspecialchars($admin['wa_phone_id']) ?>)
-                            </span>
-                        </label>
+        <div style="margin-bottom: 20px;">
+            <?php foreach ($unassigned_msgs as $msg): 
+                $assigned_admin = null;
+                foreach ($admins as $admin) {
+                    if ($admin['wa_phone_id'] === $msg['from_phone']) {
+                        $assigned_admin = $admin;
+                        break;
+                    }
+                }
+            ?>
+                <div class="msg-group">
+                    <div class="msg-info">
+                        <div class="msg-phone"><?= htmlspecialchars($msg['from_phone']) ?></div>
+                        <div class="msg-count"><?= $msg['count'] ?> mensajes</div>
                     </div>
-                <?php endforeach; ?>
-            </div>
+                    <div class="msg-admin">
+                        <?= $assigned_admin ? htmlspecialchars($assigned_admin['nombre']) : '⚠️ Sin mapeo' ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
 
+        <form method="POST">
+            <input type="hidden" name="auto_assign" value="1">
             <button type="submit" class="btn-assign">
-                ✅ Asignar <?= $unassigned_count ?> Mensajes
+                ✅ Auto-Asignar <?= $total_unassigned ?> Mensajes
             </button>
         </form>
     <?php else: ?>
