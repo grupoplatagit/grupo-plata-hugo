@@ -22,32 +22,37 @@ if ($action === 'leads_with_phone') {
 // ── Get conversations list ────────────────────────────────────────────────────
 if ($action === 'conversations') {
     $adminId = $_SESSION['admin_id'] ?? 0;
+
+    // Check if all messages are assigned (migration complete)
+    $unassigned = $db->query("SELECT COUNT(*) FROM wa_messages WHERE admin_id IS NULL")->fetchColumn();
+    $filterClause = ($unassigned > 0) ? "(admin_id IS NULL OR admin_id = $adminId)" : "(admin_id = $adminId)";
+
     $sql = "
         SELECT
             l.id        AS lead_id,
             l.nombre    AS nombre,
             l.whatsapp  AS phone,
             l.nicho     AS nicho,
-            (SELECT body FROM wa_messages WHERE lead_id = l.id AND (admin_id IS NULL OR admin_id = $adminId) ORDER BY created_at DESC LIMIT 1) AS last_msg,
-            (SELECT created_at FROM wa_messages WHERE lead_id = l.id AND (admin_id IS NULL OR admin_id = $adminId) ORDER BY created_at DESC LIMIT 1) AS last_ts,
-            (SELECT COUNT(*) FROM wa_messages WHERE lead_id = l.id AND direction = 'in' AND leido = 0 AND (admin_id IS NULL OR admin_id = $adminId)) AS unread,
+            (SELECT body FROM wa_messages WHERE lead_id = l.id AND {$filterClause} ORDER BY created_at DESC LIMIT 1) AS last_msg,
+            (SELECT created_at FROM wa_messages WHERE lead_id = l.id AND {$filterClause} ORDER BY created_at DESC LIMIT 1) AS last_ts,
+            (SELECT COUNT(*) FROM wa_messages WHERE lead_id = l.id AND direction = 'in' AND leido = 0 AND {$filterClause}) AS unread,
             COALESCE((SELECT label FROM wa_contacts WHERE phone = l.whatsapp), 'nuevo') AS label,
             COALESCE((SELECT wa_name FROM wa_contacts WHERE phone = l.whatsapp), '') AS wa_name
         FROM leads l
-        WHERE EXISTS (SELECT 1 FROM wa_messages WHERE lead_id = l.id AND (admin_id IS NULL OR admin_id = $adminId))
+        WHERE EXISTS (SELECT 1 FROM wa_messages WHERE lead_id = l.id AND {$filterClause})
         UNION ALL
         SELECT
             NULL          AS lead_id,
             COALESCE((SELECT wa_name FROM wa_contacts WHERE phone = from_phone), from_phone) AS nombre,
             from_phone    AS phone,
             'Desconocido' AS nicho,
-            (SELECT body FROM wa_messages m2 WHERE m2.from_phone = m.from_phone AND m2.lead_id IS NULL AND (m2.admin_id IS NULL OR m2.admin_id = $adminId) ORDER BY m2.created_at DESC LIMIT 1) AS last_msg,
+            (SELECT body FROM wa_messages m2 WHERE m2.from_phone = m.from_phone AND m2.lead_id IS NULL AND {$filterClause} ORDER BY m2.created_at DESC LIMIT 1) AS last_msg,
             MAX(created_at) AS last_ts,
             SUM(CASE WHEN direction='in' AND leido=0 THEN 1 ELSE 0 END) AS unread,
             COALESCE((SELECT label FROM wa_contacts WHERE phone = from_phone), 'nuevo') AS label,
             COALESCE((SELECT wa_name FROM wa_contacts WHERE phone = from_phone), '') AS wa_name
         FROM wa_messages m
-        WHERE lead_id IS NULL AND (admin_id IS NULL OR admin_id = $adminId)
+        WHERE lead_id IS NULL AND {$filterClause}
         GROUP BY from_phone
         ORDER BY last_ts DESC
     ";
@@ -59,7 +64,12 @@ if ($action === 'conversations') {
 // ── Get messages for a lead or phone ─────────────────────────────────────────
 if ($action === 'messages') {
     $since = (int)($_GET['since'] ?? 0);
+    $adminId = $_SESSION['admin_id'] ?? 0;
     $lead  = null;
+
+    // Check if migration is complete for filter logic
+    $unassigned = $db->query("SELECT COUNT(*) FROM wa_messages WHERE admin_id IS NULL")->fetchColumn();
+    $filterClause = ($unassigned > 0) ? "(admin_id IS NULL OR admin_id = $adminId)" : "(admin_id = $adminId)";
 
     if (!empty($_GET['lead_id'])) {
         $leadId = (int)$_GET['lead_id'];
@@ -67,11 +77,11 @@ if ($action === 'messages') {
             SELECT id, lead_id, from_phone, wa_msg_id, direction, body, leido, wa_status, created_at,
                    message_type, media_id, mime_type, file_name, caption
             FROM wa_messages
-            WHERE lead_id = ? AND id > ?
+            WHERE lead_id = ? AND id > ? AND {$filterClause}
             ORDER BY created_at ASC
         ");
         $stmt->execute([$leadId, $since]);
-        $db->prepare("UPDATE wa_messages SET leido = 1 WHERE lead_id = ? AND direction = 'in' AND leido = 0")
+        $db->prepare("UPDATE wa_messages SET leido = 1 WHERE lead_id = ? AND direction = 'in' AND leido = 0 AND {$filterClause}")
            ->execute([$leadId]);
         $stmt2 = $db->prepare("SELECT * FROM leads WHERE id = ?");
         $stmt2->execute([$leadId]);
@@ -82,11 +92,11 @@ if ($action === 'messages') {
             SELECT id, lead_id, from_phone, wa_msg_id, direction, body, leido, wa_status, created_at,
                    message_type, media_id, mime_type, file_name, caption
             FROM wa_messages
-            WHERE lead_id IS NULL AND from_phone = ? AND id > ?
+            WHERE lead_id IS NULL AND from_phone = ? AND id > ? AND {$filterClause}
             ORDER BY created_at ASC
         ");
         $stmt->execute([$phone, $since]);
-        $db->prepare("UPDATE wa_messages SET leido = 1 WHERE lead_id IS NULL AND from_phone = ? AND direction = 'in' AND leido = 0")
+        $db->prepare("UPDATE wa_messages SET leido = 1 WHERE lead_id IS NULL AND from_phone = ? AND direction = 'in' AND leido = 0 AND {$filterClause}")
            ->execute([$phone]);
     } else {
         echo json_encode(['ok' => false, 'msg' => 'lead_id o phone requerido']);
