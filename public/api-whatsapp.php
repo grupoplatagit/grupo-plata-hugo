@@ -104,6 +104,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $file_name = null;
                     $caption = null;
 
+                    // Detectar QUÉ usuario (admin) recibe este mensaje por su phone_number_id
+                    $phone_number_id = $value['metadata']['phone_number_id'] ?? null;
+                    $admin_id = null;
+                    if ($phone_number_id) {
+                        $admin_stmt = $db->prepare("SELECT id FROM admins WHERE wa_phone_id = ? LIMIT 1");
+                        $admin_stmt->execute([$phone_number_id]);
+                        $admin_row = $admin_stmt->fetch();
+                        if ($admin_row) {
+                            $admin_id = $admin_row['id'];
+                        }
+                    }
+
                     try {
                         switch ($msg_type) {
                             case 'text':
@@ -167,9 +179,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         $db->prepare("
                             INSERT INTO wa_messages
-                            (lead_id, from_phone, wa_msg_id, direction, message_type, body, media_id, mime_type, file_name, caption, media_url, media_status, leido, wa_status, created_at)
-                            VALUES (?, ?, ?, 'in', ?, ?, ?, ?, ?, ?, ?, ?, 0, 'received', datetime('now', 'localtime'))
-                        ")->execute([$lead_id, $from, $wa_msg_id, $msg_type, $body, $media_id, $mime_type, $file_name, $caption, $media_url, $media_status]);
+                            (lead_id, from_phone, wa_msg_id, direction, message_type, body, media_id, mime_type, file_name, caption, media_url, media_status, leido, wa_status, admin_id, created_at)
+                            VALUES (?, ?, ?, 'in', ?, ?, ?, ?, ?, ?, ?, ?, 0, 'received', ?, datetime('now', 'localtime'))
+                        ")->execute([$lead_id, $from, $wa_msg_id, $msg_type, $body, $media_id, $mime_type, $file_name, $caption, $media_url, $media_status, $admin_id]);
 
                         $log_msg = date('Y-m-d H:i:s') . " MSG IN [$msg_type]: $from - $body (wamid: $wa_msg_id)";
                         if ($media_id) {
