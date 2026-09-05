@@ -18,13 +18,13 @@ $admins = $db->query("
 
 // Obtener estadísticas de mensajes sin asignar por phone_number_id
 $unassigned_msgs = $db->query("
-    SELECT 
-        COALESCE(from_phone, '') as from_phone,
+    SELECT
+        COALESCE(phone_number_id, '') as phone_number_id,
         COUNT(*) as count,
-        (SELECT nombre FROM admins WHERE wa_phone_id = COALESCE(from_phone, '')) as admin_name
+        (SELECT nombre FROM admins WHERE wa_phone_id = phone_number_id LIMIT 1) as admin_name
     FROM wa_messages
-    WHERE admin_id IS NULL
-    GROUP BY from_phone
+    WHERE admin_id IS NULL AND phone_number_id IS NOT NULL
+    GROUP BY phone_number_id
     ORDER BY count DESC
 ")->fetchAll(\PDO::FETCH_ASSOC);
 
@@ -36,13 +36,13 @@ foreach ($unassigned_msgs as $msg) {
 // Procesar auto-asignación
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auto_assign'])) {
     $assigned_count = 0;
-    
+
     foreach ($admins as $admin) {
         if (!empty($admin['wa_phone_id'])) {
             $stmt = $db->prepare("
-                UPDATE wa_messages 
-                SET admin_id = ? 
-                WHERE admin_id IS NULL AND from_phone = ?
+                UPDATE wa_messages
+                SET admin_id = ?
+                WHERE admin_id IS NULL AND phone_number_id = ?
             ");
             $stmt->execute([$admin['id'], $admin['wa_phone_id']]);
             $assigned_count += $stmt->rowCount();
@@ -193,10 +193,10 @@ include __DIR__ . '/../../views/admin/header.php';
         </p>
 
         <div style="margin-bottom: 20px;">
-            <?php foreach ($unassigned_msgs as $msg): 
+            <?php foreach ($unassigned_msgs as $msg):
                 $assigned_admin = null;
                 foreach ($admins as $admin) {
-                    if ($admin['wa_phone_id'] === $msg['from_phone']) {
+                    if ($admin['wa_phone_id'] === $msg['phone_number_id']) {
                         $assigned_admin = $admin;
                         break;
                     }
@@ -204,7 +204,7 @@ include __DIR__ . '/../../views/admin/header.php';
             ?>
                 <div class="msg-group">
                     <div class="msg-info">
-                        <div class="msg-phone"><?= htmlspecialchars($msg['from_phone']) ?></div>
+                        <div class="msg-phone"><?= htmlspecialchars($msg['phone_number_id']) ?></div>
                         <div class="msg-count"><?= $msg['count'] ?> mensajes</div>
                     </div>
                     <div class="msg-admin">

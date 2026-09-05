@@ -179,9 +179,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         $db->prepare("
                             INSERT INTO wa_messages
-                            (lead_id, from_phone, wa_msg_id, direction, message_type, body, media_id, mime_type, file_name, caption, media_url, media_status, leido, wa_status, admin_id, created_at)
-                            VALUES (?, ?, ?, 'in', ?, ?, ?, ?, ?, ?, ?, ?, 0, 'received', ?, datetime('now', 'localtime'))
-                        ")->execute([$lead_id, $from, $wa_msg_id, $msg_type, $body, $media_id, $mime_type, $file_name, $caption, $media_url, $media_status, $admin_id]);
+                            (lead_id, from_phone, wa_msg_id, direction, message_type, body, media_id, mime_type, file_name, caption, media_url, media_status, leido, wa_status, admin_id, phone_number_id, created_at)
+                            VALUES (?, ?, ?, 'in', ?, ?, ?, ?, ?, ?, ?, ?, 0, 'received', ?, ?, datetime('now', 'localtime'))
+                        ")->execute([$lead_id, $from, $wa_msg_id, $msg_type, $body, $media_id, $mime_type, $file_name, $caption, $media_url, $media_status, $admin_id, $phone_number_id]);
 
                         $log_msg = date('Y-m-d H:i:s') . " MSG IN [$msg_type]: $from - $body (wamid: $wa_msg_id)";
                         if ($media_id) {
