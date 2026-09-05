@@ -300,6 +300,10 @@ function _migrateDB(PDO $pdo): void {
         if (!in_array('media_status', $waMsgCols)) {
             $pdo->exec("ALTER TABLE wa_messages ADD COLUMN media_status TEXT DEFAULT 'pending'");
         }
+        // Agregar columna para guardar phone_number_id del webhook (aislamiento de mensajes)
+        if (!in_array('phone_number_id', $waMsgCols)) {
+            $pdo->exec("ALTER TABLE wa_messages ADD COLUMN phone_number_id TEXT");
+        }
     }
     // User WhatsApp Configuration
     if (!in_array('user_whatsapp_config', $tables)) {
